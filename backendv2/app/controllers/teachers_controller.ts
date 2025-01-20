@@ -2,13 +2,23 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Teacher from '#models/teacher'
 import { storeTeacherValidator, updateTeacherValidator } from '#validators/teacher'
 import drive from '@adonisjs/drive/services/main'
+import moment from 'moment'
 
 export default class TeachersController {
   async index({ request, response }: HttpContext) {
     try {
       let teacher = Teacher.query()
       if (request.input('presence')) {
-        teacher.preload('presences')
+        if (request.input('month') && request.input('year')) {
+          const monthYear = `${request.input('month')}-${request.input('year')}`
+          const date = moment(monthYear, 'M-YYYY')
+          teacher.preload('presences', (query) => {
+            query.whereBetween('date', [
+              date.startOf('months').format('YYYY-MM-DD'),
+              date.endOf('months').format('YYYY-MM-DD'),
+            ])
+          })
+        }
       }
       if (request.input('user')) {
         teacher.preload('user')

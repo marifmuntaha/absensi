@@ -209,7 +209,7 @@ const School = () => {
                     <Col lg="7" className="offset-lg-4">
                       <div className="form-group mt-2">
                         <Button color="success" size="md">
-                          {loading ? <Spinner size="sm" color="white" /> : 'Perbarui'}
+                          {loading ? <Spinner size="sm" /> : 'Perbarui'}
                         </Button>
                       </div>
                     </Col>
@@ -239,7 +239,7 @@ const School = () => {
                             </div>
                             <div className="input-group-append">
                               <Button outline color="success" className="btn-dim">
-                                {loading ? <Spinner size="sm" color="white" /> : <Icon name="upload" />}
+                                {loading ? <Spinner size="sm" /> : <Icon name="upload" />}
                               </Button>
                             </div>
                           </div>

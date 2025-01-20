@@ -9,7 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import drive from '@adonisjs/drive/services/main'
+import Presence from '#models/presence'
 
 const AuthController = () => import('#controllers/auth_controller')
 const HolidayController = () => import('#controllers/holidays_controller')
@@ -36,7 +36,8 @@ router
       })
       .prefix('auth')
     router.get('test', async () => {
-      await drive.use().delete('images/qrcode/1234512345123456.png')
+      const presence = await Presence.query().whereBetween('date', ['2025-01-01', '2025-01-31'])
+      console.log(presence)
     })
     router
       .group(() => {

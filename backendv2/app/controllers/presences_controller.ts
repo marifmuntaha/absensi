@@ -1,11 +1,27 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Presence from '#models/presence'
 import { storePresenceValidator, updatePresenceValidator } from '#validators/presence'
+import moment from 'moment'
 
 export default class PresencesController {
-  async index({ response }: HttpContext) {
+  async index({ request, response }: HttpContext) {
     try {
-      const presences = await Presence.all()
+      const presence = Presence.query()
+      if (request.input('teacher_id')) {
+        presence.where('teacherId', request.input('teacher_id'))
+      }
+      if (request.input('month') && request.input('year')) {
+        const { month, year } = request.all()
+        const date = moment(`${month}-${year}`, 'M-YYYY')
+        presence.whereBetween('date', [
+          date.startOf('months').format('YYYY-MM-DD'),
+          date.endOf('months').format('YYYY-MM-DD'),
+        ])
+      }
+      if (request.input('date')) {
+        presence.where('date', request.input('date'))
+      }
+      const presences = await presence.orderBy('date', 'asc')
       return response.status(200).json({
         result: presences,
       })
@@ -59,7 +75,7 @@ export default class PresencesController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error.message,
       })
     }
   }

@@ -23,7 +23,7 @@ export default class HolidaysController {
       })
     } catch (error) {
       return response.status(422).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error.message,
       })
     }
   }

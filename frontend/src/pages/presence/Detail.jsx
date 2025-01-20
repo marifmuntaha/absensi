@@ -142,13 +142,13 @@ const Detail = () => {
                             </thead>
                             <tbody>
                             {teachers.map((item, idx) => {
-                                const present = item.presences?.filter((value) => {
+                                const present = item.presences.filter((value) => {
                                     return value.statusIn === 'H'
                                 });
-                                const permission = item.presences?.filter((value) => {
+                                const permission = item.presences.filter((value) => {
                                     return value.statusIn === 'I'
                                 });
-                                const sick = item.presences?.filter((value) => {
+                                const sick = item.presences.filter((value) => {
                                     return value.statusIn === 'S'
                                 });
                                 const absent = item.presences?.filter((value) => {
@@ -158,10 +158,11 @@ const Detail = () => {
                                   <tr key={idx} className="text-center" style={{verticalAlign: "middle"}}>
                                       <td>{item.name}</td>
                                       {days.map((day, idx) => {
-                                          const presence = item.presences?.filter((value) => {
+                                          const presence = item.presences.filter((value) => {
                                               return moment(value.date, 'YYYY-MM-DD').date().toString() === day;
                                           })
-                                          if (presence?.length > 0 && !holidays.includes(day) && !getWeekday(day)) {
+                                          console.log(presence)
+                                          if (presence.length > 0 && !holidays.includes(day) && !getWeekday(day)) {
                                               return (
                                                 <React.Fragment key={idx}>
                                                     <td><Badge pill color={colorState(presence[0].statusIn)}>{presence[0].statusIn}</Badge></td>

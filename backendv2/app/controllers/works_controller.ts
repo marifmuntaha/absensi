@@ -5,7 +5,7 @@ import { storeWorkValidator, updateWorkValidator } from '#validators/work'
 export default class WorksController {
   async index({ response }: HttpContext) {
     try {
-      const works = await Work.all()
+      const works = await Work.query().orderBy('day', 'asc')
       return response.status(200).json({
         result: works,
       })
@@ -20,6 +20,7 @@ export default class WorksController {
     try {
       const data = request.all()
       const payload = await storeWorkValidator.validate(data)
+      // @ts-ignore
       const storeWork = await Work.create(payload)
       return response.status(201).json({
         message: 'Data Jam berhasil disimpan.',
@@ -50,6 +51,7 @@ export default class WorksController {
       const data = request.all()
       const payload = await updateWorkValidator.validate(data)
       const work = await Work.findOrFail(payload.id)
+      // @ts-ignore
       const updateWork = await work.fill(payload).save()
       return response.status(200).json({
         message: 'Data Jam berhasil diperbarui.',

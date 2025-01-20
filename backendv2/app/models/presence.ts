@@ -8,7 +8,7 @@ export default class Presence extends BaseModel {
   declare id: number
 
   @column()
-  declare teacher_id: number
+  declare teacherId: number
 
   @column()
   declare date: DateTime;
@@ -20,10 +20,10 @@ export default class Presence extends BaseModel {
   declare out: DateTime
 
   @column()
-  declare status_in: string
+  declare statusIn: string
 
   @column()
-  declare status_out: string
+  declare statusOut: string
 
   @column()
   declare description: string
@@ -39,7 +39,7 @@ export default class Presence extends BaseModel {
 
   @hasOne(() => Teacher, {
     foreignKey: 'id',
-    localKey: 'teacher_id',
+    localKey: 'teacherId',
   })
   declare teacher: HasOne<typeof Teacher>
 }

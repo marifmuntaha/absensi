@@ -9,17 +9,18 @@ import {APICore} from "../../utils/api/APICore";
 
 const menu = () => {
     const api = new APICore();
-    const {user} = api.getLoggedInUser();
-    if (user.role === '1'){
-        return adminMenu;
+    const user = api.getLoggedInUser();
+    // noinspection JSUnresolvedReference
+    switch (user?.role) {
+        case "1":
+            return adminMenu;
+        case "2":
+            return headMenu;
+        case "3":
+            return teacherMenu;
+        default:
+            return []
     }
-    else if (user.role === '2'){
-        return headMenu;
-    }
-    else if (user.role === '3'){
-        return teacherMenu;
-    }
-    console.log(user)
 }
 const MenuHeading = ({ heading }) => {
     return (
@@ -278,7 +279,7 @@ const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props })
 const Menu = ({ sidebarToggle, mobileView }) => {
     const [data, setMenuData] = useState(menu());
     useEffect(() => {
-        data.forEach((item, index) => {
+        data?.forEach((item, index) => {
             if (item.panel) {
                 let found = item.subPanel.find((sPanel) => process.env.PUBLIC_URL + sPanel.link === window.location.pathname);
                 if (found) {
@@ -290,7 +291,7 @@ const Menu = ({ sidebarToggle, mobileView }) => {
 
     return (
         <ul className="nk-menu">
-            {data.map((item, index) =>
+            {data?.map((item, index) =>
                 item.heading ? (
                     <MenuHeading heading={item.heading} key={item.heading} />
                 ) : item.panel ? (

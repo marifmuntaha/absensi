@@ -22,7 +22,7 @@ export const storePresenceValidator = vine.compile(
 export const updatePresenceValidator = vine.compile(
   vine.object({
     id: vine.number(),
-    teacher_id: vine.number(),
+    teacherId: vine.number(),
     date: vine.date(),
     in: vine.date({
       formats: 'HH:mm:ss',
@@ -30,8 +30,8 @@ export const updatePresenceValidator = vine.compile(
     out: vine.date({
       formats: 'HH:mm:ss',
     }),
-    status_in: vine.string(),
-    status_out: vine.string(),
+    statusIn: vine.string(),
+    statusOut: vine.string(),
     description: vine.string().optional(),
     letter: vine.string().optional(),
   })
