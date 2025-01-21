@@ -9,16 +9,17 @@ export function useYear() {
 }
 
 const YearProvider = ({...props}) => {
-    const [years, setYears] = useState([]);
+    const [year, setYear] = useState({});
 
     useEffect(() => {
         getYears({active: true}).then(resp => {
-            setYears(resp.data.result);
+            setYear(resp.data.result);
         }).catch(err => RToast(err, 'error'));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
-        <YearContext.Provider value={years}>
+        <YearContext.Provider value={[year, setYear]}>
             {props.children}
         </YearContext.Provider>
     )

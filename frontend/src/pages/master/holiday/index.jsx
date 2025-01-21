@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from "react";
 import Head from "../../../layout/head";
 import {
@@ -23,7 +22,7 @@ import {useSemester} from "../../../layout/provider/Semester";
 import {toast} from "react-toastify";
 
 const Holiday = () => {
-    const semester = useSemester();
+    const [semester] = useSemester();
     const [sm, updateSm] = useState(false);
     const [loadData, setLoadData] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -81,7 +80,6 @@ const Holiday = () => {
         let end = moment(semester.end, 'YYYY-MM-DD');
         let year = moment(semester.end, 'YYYY-MM-DD').format('YYYY').toString();
         let months = []
-        let item = 1;
         while (start <= end){
             months.push(start.format('M'));
             start.add(1, 'M')
@@ -97,7 +95,7 @@ const Holiday = () => {
                         const params = {
                             semester_id: semester.id,
                             name: item.holiday_name,
-                            date: item.holiday_date,
+                            date: moment(item.holiday_date, 'YYYY-M-D').format('YYYY-MM-DD HH:mm:ss'),
                             description: ''
                         }
                         item++;

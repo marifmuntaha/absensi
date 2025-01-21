@@ -3,9 +3,11 @@ import {Button, Label, Modal, ModalBody, ModalHeader, Spinner} from "reactstrap"
 import {Col, Row, RSelect, RToast} from "../../../components";
 import {Controller, useForm} from "react-hook-form";
 import {store as storeYear, update as updateYear} from "../../../utils/api/year"
+import {useYear} from "../../../layout/provider/Year";
 
 const Partials = ({...props}) => {
     const {register, handleSubmit, setValue, formState: {errors}, getValues, reset, control} = useForm();
+    const [year, setYear] = useYear();
     const [loading, setLoading] = useState(false);
     const optionActive = [
         {value: '1', label: 'Aktif'},
@@ -27,6 +29,7 @@ const Partials = ({...props}) => {
             RToast(resp.data.message, 'success');
             toggle();
             props.setLoadData(true);
+            resp.data.result?.active === '1' && setYear(resp.data.result.year);
         }).catch(err => RToast(err, 'error'));
     }
     const updateSubmit = async () => {
@@ -41,6 +44,7 @@ const Partials = ({...props}) => {
             RToast(resp.data.message, 'success');
             toggle();
             props.setLoadData(true);
+            resp.data.result.active === '1' && setYear(resp.data.result);
         }).catch(err => RToast(err, 'error'));
     }
     const toggle = () => {
@@ -58,6 +62,7 @@ const Partials = ({...props}) => {
             setValue('description', year.description);
             setValue('active', year.active);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.year]);
 
     return (

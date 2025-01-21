@@ -9,14 +9,15 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import Presence from '#models/presence'
 
 const AuthController = () => import('#controllers/auth_controller')
 const HolidayController = () => import('#controllers/holidays_controller')
+const PermissionController = () => import('#controllers/permissions_controller')
 const PresenceController = () => import('#controllers/presences_controller')
 const SchoolController = () => import('#controllers/schools_controller')
 const SemesterController = () => import('#controllers/semesters_controller')
 const TeacherController = () => import('#controllers/teachers_controller')
+const TokenController = () => import('#controllers/tokens_controller')
 const UserController = () => import('#controllers/users_controller')
 const WorkController = () => import('#controllers/works_controller')
 const YearController = () => import('#controllers/years_controller')
@@ -36,8 +37,7 @@ router
       })
       .prefix('auth')
     router.get('test', async () => {
-      const presence = await Presence.query().whereBetween('date', ['2025-01-01', '2025-01-31'])
-      console.log(presence)
+      return 'test'
     })
     router
       .group(() => {
@@ -50,8 +50,10 @@ router
             router.resource('year', YearController).apiOnly()
           })
           .prefix('master')
+        router.resource('permission', PermissionController).apiOnly()
         router.resource('presence', PresenceController).apiOnly()
         router.resource('teacher', TeacherController).apiOnly()
+        router.resource('token', TokenController).only(['index'])
         router.resource('user', UserController).apiOnly()
       })
       .use(middleware.auth())

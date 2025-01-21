@@ -11,7 +11,7 @@ export default class WorksController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0] : error.message,
       })
     }
   }
@@ -28,7 +28,7 @@ export default class WorksController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0] : error.message,
       })
     }
   }
@@ -41,7 +41,7 @@ export default class WorksController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0] : error.message,
       })
     }
   }
@@ -59,7 +59,7 @@ export default class WorksController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0] : error.message,
       })
     }
   }
@@ -74,7 +74,7 @@ export default class WorksController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0] : error.message,
       })
     }
   }

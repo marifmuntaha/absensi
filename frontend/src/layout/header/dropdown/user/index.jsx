@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { DropdownToggle, DropdownMenu, Dropdown } from "reactstrap";
 import { Icon, LinkList, LinkItem, UserAvatar } from "../../../../components/";
-import { useTheme, useThemeUpdate } from "../../../provider/Theme";
 import {APICore} from "../../../../utils/api/APICore";
+import {logout} from "../../../../utils/api/auth"
+import {RToast} from "../../../../components";
+import {useNavigate} from "react-router-dom";
 
 const User = () => {
     const api = new APICore();
     const user = api.getLoggedInUser();
-    const theme = useTheme();
-    const themeUpdate = useThemeUpdate();
+    const navigation = useNavigate();
     const [open, setOpen] = useState(false);
     const toggle = () => setOpen((prevState) => !prevState);
     const role = (role) => {
@@ -63,7 +64,14 @@ const User = () => {
                 </div>
                 <div className="dropdown-inner">
                     <LinkList>
-                        <a href={`${process.env.PUBLIC_URL}/auth/keluar`}>
+                        <a href='#logout' onClick={() => logout(user).then(resp => {
+                            RToast(resp.data.message, 'success')
+                            api.setLoggedInUser(null)
+                            api.setUserInSession(null)
+                            localStorage.removeItem('teacher')
+                            navigation('/auth/keluar')
+                        }).catch(err => RToast(err, 'error'))
+                        }>
                             <Icon name="signout"></Icon>
                             <span>Keluar</span>
                         </a>

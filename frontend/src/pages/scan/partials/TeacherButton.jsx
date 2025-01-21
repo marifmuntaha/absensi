@@ -1,20 +1,17 @@
-import React, {Suspense, useEffect, useRef, useState} from "react";
-import {BlockContent, BlockDes, BlockHead, BlockTitle, PreviewCard, RToast} from "../../../components";
+import React, {Suspense, useEffect, useState} from "react";
+import {Block, BlockContent, BlockDes, BlockHead, BlockTitle, Button, PreviewCard, RToast} from "../../../components";
 import moment from "moment";
-import {Alert} from "reactstrap";
-import {get as getWorks} from "../../../utils/api/work";
+import {Alert, Spinner} from "reactstrap";
 import {get as getPresence, update as updatePresence} from "../../../utils/api/presence";
-import QrScanner from "qr-scanner";
+import {get as getWorks} from "../../../utils/api/work";
 
-const TeacherScan = () => {
-    const scanner = useRef();
-    const videoEl = useRef();
-    const qrBoxEl = useRef();
-    const [qrOn, setQrOn] = useState(true);
-    const [time, setTime] = useState('');
-    const onScanSuccess = (result) => {
-        scanner?.current?.stop();
-        const teacher = JSON.parse(result.data);
+const TeacherButton = () => {
+    const teacher = JSON.parse(localStorage.getItem("teacher"));
+    const [loading, setLoading] = useState(false);
+    const [time, setTime] = useState()
+    const onSubmit = (e) => {
+        e.preventDefault()
+        setLoading(true)
         getWorks().then(resp => {
             // noinspection DuplicatedCode
             const time = resp.data.result;
@@ -27,6 +24,7 @@ const TeacherScan = () => {
             const endTimeEnd = mutationTime(timeInDay.out, 3);
             if (moment().toDate() < startTimeIn.toDate()){
                 RToast('Absensi masuk belum dimulai.', 'error');
+                setLoading(false);
             } else {
                 if (startTimeIn.toDate() > moment().toDate() && moment().toDate() < endTimeIn.toDate()){
                     getPresence({date: moment().format("YYYY-MM-DD"), teacher_id: teacher.id}).then(resp => {
@@ -38,9 +36,11 @@ const TeacherScan = () => {
                             RToast('Presensi Masuk berhasil disimpan.', 'success')
                         }).catch(err => {
                             RToast(err, 'error');
+                            setLoading(false);
                         });
                     }).catch(err => {
                         RToast(err, 'error');
+                        setLoading(false);
                     });
                 }
                 else if (endTimeIn.toDate() < moment().toDate() && moment().toDate() < startTimeEnd.toDate()) {
@@ -56,60 +56,25 @@ const TeacherScan = () => {
                             RToast('Presensi Pulang berhasil disimpan.', 'success')
                         }).catch(err => {
                             RToast(err, 'error')
+                            setLoading(false)
                         });
                     }).catch(err => {
                         RToast(err, 'error');
+                        setLoading(false);
                     });
                 }
                 else {
                     RToast('Absensi telah selesai hari ini.', 'error');
+                    setLoading(false)
                 }
             }
         });
-        setTimeout(() => {
-            scanner?.current?.start()
-        }, 5000)
-    };
-    // noinspection DuplicatedCode
-    const onScanFail = (err) => {
-        console.log(err);
-    };
+    }
+
     const mutationTime = (time, value) => {
         return moment(time, 'HH : mm : ss').add(value, 'hours');
     }
-    useEffect(() => {
-        if (videoEl?.current && !scanner.current) {
-            scanner.current = new QrScanner(videoEl?.current, onScanSuccess, {
-                onDecodeError: onScanFail,
-                preferredCamera: "environment",
-                highlightScanRegion: true,
-                highlightCodeOutline: true,
-                overlay: qrBoxEl?.current || undefined,
-            });
-            scanner?.current
-                ?.start()
-                .then((resp) => {
-                    console.log(resp);
-                    setQrOn(true)
-                })
-                .catch((err) => {
-                    if (err) setQrOn(false);
-                });
-        }
-        return () => {
-            // eslint-disable-next-line
-            if (!videoEl?.current) {
-                scanner?.current?.stop();
-            }
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    useEffect(() => {
-        if (!qrOn)
-            alert(
-                "Camera is blocked or not accessible. Please allow camera in your browser permissions and Reload."
-            );
-    }, [qrOn]);
+    
     useEffect(() => {
         setInterval(() => {
             setTime(moment().format('HH:mm:ss'));
@@ -117,7 +82,7 @@ const TeacherScan = () => {
     }, [time]);
 
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
             <PreviewCard className="card-bordered" bodyClass="card-inner-lg">
                 <BlockHead>
                     <BlockContent className="text-center">
@@ -125,18 +90,22 @@ const TeacherScan = () => {
                         <BlockTitle className="text-primary">{moment(new Date()).locale('id').format('dddd, DD MMMM YYYY')}</BlockTitle>
                         <BlockTitle className="text-primary">{time}</BlockTitle>
                         <BlockDes>
-                            <Alert className="alert-icon" color="danger">
-                                <p className="fw-bold fs-6">Arahkan Kamera ke QRCode Absensi</p>
+                            <Alert color="danger">
+                                <p className="fw-bold fs-6">Tekan Tombol dibawah ini untuk melakukan Presensi</p>
                             </Alert>
                         </BlockDes>
                     </BlockContent>
                 </BlockHead>
-                <div className="ratio ratio-16x9">
-                    <video ref={videoEl}></video>
-                </div>
+                <Block className="mt-3">
+                    <div className="form-group">
+                        <Button size="xl" className="btn-block" color="success" onClick={(e) => onSubmit(e)}>
+                            {loading ? <Spinner size="md" color="light"/> : "HADIR"}
+                        </Button>
+                    </div>
+                </Block>
             </PreviewCard>
         </Suspense>
     )
 }
 
-export default TeacherScan;
+export default TeacherButton;

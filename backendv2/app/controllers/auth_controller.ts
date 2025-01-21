@@ -27,14 +27,16 @@ export default class AuthController {
 
   async logout({ request, response }: HttpContext) {
     try {
-      const { user } = request.all()
-      const auth = await User.findOrFail(user.id)
+      const { id } = request.all()
+      const auth = await User.findOrFail(id)
       await User.accessTokens.delete(auth, '1')
       return response.status(200).json({
         message: 'Berhasil Keluar',
       })
     } catch (error) {
-      return response.badRequest(error)
+      return response.status(400).json({
+        message: error.messages ? error.messages[0].message : error,
+      })
     }
   }
 }

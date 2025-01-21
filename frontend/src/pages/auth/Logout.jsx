@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Suspense} from "react";
 import Logo from "../../images/logo.png";
 import LogoDark from "../../images/logo-dark.png";
 import Head from "../../layout/head";
@@ -9,7 +9,7 @@ import {Button} from "../../components";
 
 const Success = () => {
     return (
-        <>
+        <Suspense fallback={<div>Loading...</div>}>
             <Head title="Success" />
             <Block className="nk-block-middle nk-auth-body">
                 <div className="brand-logo pb-5">
@@ -33,7 +33,7 @@ const Success = () => {
                 </BlockHead>
             </Block>
             <Footer />
-        </>
+        </Suspense>
     );
 };
 export default Success;

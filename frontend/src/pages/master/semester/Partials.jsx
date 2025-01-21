@@ -5,11 +5,12 @@ import {Controller, useForm} from "react-hook-form";
 import {store as storeSemester, update as updateSemester} from "../../../utils/api/semester"
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import semester from "./index";
+import {useSemester} from "../../../layout/provider/Semester";
 
 const Partials = ({...props}) => {
     const year = props.year;
     const {handleSubmit, setValue, formState: {errors}, getValues, reset, control} = useForm();
+    const [semester, setSemester] = useSemester();
     const [loading, setLoading] = useState(false);
     const optionSemesters = [
         {value: '1', label: 'Semester Gasal'},
@@ -37,6 +38,7 @@ const Partials = ({...props}) => {
             RToast(resp.data.message, 'success');
             toggle();
             props.setLoadData(true);
+            resp.data.result.active === '1' && setSemester(resp.data.result)
         }).catch(err => RToast(err, 'error'));
     }
     const updateSubmit = async () => {
@@ -53,6 +55,7 @@ const Partials = ({...props}) => {
             RToast(resp.data.message, 'success');
             toggle();
             props.setLoadData(true);
+            resp.data.result.active === '1' && setSemester(resp.data.result)
         }).catch(err => RToast(err, 'error'));
     }
     const toggle = () => {
@@ -75,6 +78,7 @@ const Partials = ({...props}) => {
             setValue('end', moment(semester.end).toDate());
             setValue('active', semester.active);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.semester]);
 
     return (

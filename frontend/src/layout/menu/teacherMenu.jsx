@@ -7,7 +7,7 @@ const teacherMenu = [
     {
         icon: "user-fill",
         text: "Data Guru",
-        link: "/data-guru",
+        link: "/guru/ubah",
     },
     {
         icon: "calendar",
@@ -15,19 +15,23 @@ const teacherMenu = [
         active: false,
         subMenu: [
             {
-                text: "Kelola Absensi",
-                link: "/absensi/kelola",
+                text: "Scan",
+                link: "/scan/absensi",
+            },
+            {
+                text: "Perijinan",
+                link: "/guru/absensi/perijinan",
             },
             {
                 text: "Rekapitulasi",
-                link: "/absensi/rekapitulasi",
+                link: "/guru/absensi/rekapitulasi",
             },
         ],
     },
     {
         icon: "setting-alt",
         text: "Pengaturan",
-        link: "/pengaturan",
+        link: "/guru/pengaturan-pengguna",
     },
 ];
 export default teacherMenu;

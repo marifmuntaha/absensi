@@ -20,6 +20,9 @@ export default class TeachersController {
           })
         }
       }
+      if (request.input('userId')) {
+        teacher.where('user_id', request.input('userId'))
+      }
       if (request.input('user')) {
         teacher.preload('user')
       }
@@ -29,7 +32,7 @@ export default class TeachersController {
       })
     } catch (error) {
       response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -91,7 +94,7 @@ export default class TeachersController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }

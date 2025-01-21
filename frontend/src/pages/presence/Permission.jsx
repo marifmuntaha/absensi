@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
-import Head from "../../../layout/head";
-import Content from "../../../layout/content";
+import React, {Suspense, useState} from "react";
+import Head from "../../layout/head";
+import Content from "../../layout/content";
 import {
     BackTo,
     Block,
@@ -11,44 +11,30 @@ import {
     Button,
     Icon,
     PreviewCard, RToast
-} from "../../../components";
-import ReactDataTable from "../../../components/table";
+} from "../../components";
+import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
+import {destroy as destroyYear} from "../../utils/api/year";
 import Partials from "./Partials";
-import {get as getSemesters, destroy as destroySemester} from "../../../utils/api/semester"
-import {useYear} from "../../../layout/provider/Year";
-import moment from "moment";
-import "moment/locale/id"
 
-const Semester = () => {
-    const [year] = useYear();
+const Permission = () => {
     const [sm, updateSm] = useState(false);
-    const [semesters, setSemesters] = useState([]);
-    const [semester, setSemester] = useState(null);
-    const [loadData, setLoadData] = useState(true);
     const [modal, setModal] = useState(false);
+    const [permissions, setPermissions] = useState([]);
+    const [permission, setPermission] = useState({});
     const [loading, setLoading] = useState(false);
+    const [loadData, setLoadData] = useState(true);
     const Columns = [
         {
             name: "Nama Tahun",
-            selector: (row) => row.year && row.year.name,
+            selector: (row) => row.name,
             sortable: false,
         },
         {
-            name: "Semester",
-            selector: (row) => row.name === '1' ? 'Gasal' : 'Genap',
+            name: "Diskripsi",
+            selector: (row) => row.description,
             sortable: false,
             hide: 370,
-        },
-        {
-            name: "Mulai",
-            selector: (row) => moment(row.start, 'YYYY-MM-DD').locale('id').format('DD MMMM YYYY'),
-            sortable: false,
-        },
-        {
-            name: "Selesai",
-            selector: (row) => moment(row.end, 'YYYY-MM-DD').locale('id').format('DD MMMM YYYY'),
-            sortable: false,
         },
         {
             name: "Status",
@@ -67,30 +53,26 @@ const Semester = () => {
             cell: (row) => (
                 <ButtonGroup size="sm">
                     <Button outline color="warning" onClick={() => {
-                        setSemester(row);
+                        setPermission(row);
                         setModal(true);
                     }}><Icon name="edit-alt"/></Button>
                     <Button outline color="danger" onClick={() => {
                         setLoading(row.id);
-                        destroySemester(row.id).then(resp => {
+                        destroyYear(row.id).then(resp => {
                             RToast(resp.data.message, 'success');
                             setLoadData(true);
-                        }).catch(err => RToast(err, 'error'));
+                        }).catch(err => {
+                            RToast(err, 'error')
+                            setLoading(false)
+                        });
                     }}>{loading  === row.id ? <Spinner size="sm" /> : <Icon name="trash"/>}</Button>
                 </ButtonGroup>
             )
         },
     ];
-    useEffect(() => {
-        loadData && getSemesters({year_id: year.id, with: 'year'}).then(resp => {
-            setSemesters(resp.data.result);
-            setLoadData(false)
-        }).catch(err => RToast(err, 'error'));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loadData]);
     return (
-        <React.Fragment>
-            <Head title="Data Semester" />
+        <Suspense fallback={<div>Loading..</div>}>
+            <Head title="Data Perijinan" />
             <Content page="component">
                 <BlockHead size="lg" wide="sm">
                     <BlockHeadContent>
@@ -103,7 +85,7 @@ const Semester = () => {
                     <BlockHead size="sm">
                         <BlockBetween>
                             <BlockHeadContent>
-                                <BlockTitle tag="h4">Data Semester</BlockTitle>
+                                <BlockTitle tag="h4">Data Perijinan</BlockTitle>
                                 <p>
                                     Just import <code>ReactDataTable</code> from <code>components</code>, it is built in for react dashlite.
                                 </p>
@@ -150,13 +132,13 @@ const Semester = () => {
                         </BlockBetween>
                     </BlockHead>
                     <PreviewCard>
-                        <ReactDataTable data={semesters} columns={Columns} expandableRows pagination/>
+                        <ReactDataTable data={permissions} columns={Columns} expandableRows pagination/>
                     </PreviewCard>
                 </Block>
             </Content>
-            <Partials modal={modal} setModal={setModal} semester={semester} setSemester={setSemester} setLoadData={setLoadData} year={year}/>
-        </React.Fragment>
+            <Partials modal={modal} setModal={setModal} permission={permission} setPermission={setPermission} setLoadData={setLoadData}/>
+        </Suspense>
     )
 }
 
-export default Semester;
+export default Permission;

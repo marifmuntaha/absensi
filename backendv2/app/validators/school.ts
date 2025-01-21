@@ -6,7 +6,7 @@ export const updateSchoolValidator = vine.compile(
     name: vine.string(),
     phone: vine.string(),
     address: vine.string(),
-    email: vine.string(),
+    email: vine.string().email(),
     type: vine.string(),
     logo: vine.string().optional(),
   })

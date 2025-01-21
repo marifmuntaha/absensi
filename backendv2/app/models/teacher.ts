@@ -51,7 +51,7 @@ export default class Teacher extends BaseModel {
   declare user: HasOne<typeof User>
 
   @hasMany(() => Presence, {
-    foreignKey: 'teacher_id',
+    foreignKey: 'teacherId',
     localKey: 'id',
   })
   declare presences: HasMany<typeof Presence>

@@ -16,7 +16,7 @@ export default class YearsController {
       })
     } catch (err) {
       return response.status(422).json({
-        message: err,
+        message: err.messages ? err.messages[0].message : err,
       })
     }
   }
@@ -32,7 +32,7 @@ export default class YearsController {
       })
     } catch (err) {
       return response.status(422).json({
-        message: err,
+        message: err.messages ? err.messages[0].message : err,
       })
     }
   }
@@ -45,7 +45,7 @@ export default class YearsController {
       })
     } catch (err) {
       return response.status(422).json({
-        message: err,
+        message: err.messages ? err.messages[0].message : err,
       })
     }
   }
@@ -62,7 +62,7 @@ export default class YearsController {
       })
     } catch (err) {
       return response.status(422).json({
-        message: 'Data Tapel gagal diperbarui.',
+        message: err.messages ? err.messages[0].message : err,
       })
     }
   }
@@ -77,7 +77,7 @@ export default class YearsController {
       })
     } catch (err) {
       return response.status(422).json({
-        message: 'Data Tapel gagal dihapus',
+        message: err.messages ? err.messages[0].message : err,
       })
     }
   }

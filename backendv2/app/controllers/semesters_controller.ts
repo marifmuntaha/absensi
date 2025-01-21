@@ -20,7 +20,7 @@ export default class SemestersController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -36,7 +36,7 @@ export default class SemestersController {
       })
     } catch (error) {
       return response.status(422).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -49,7 +49,7 @@ export default class SemestersController {
       })
     } catch (error) {
       return response.status(422).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -66,7 +66,7 @@ export default class SemestersController {
       })
     } catch (error) {
       return response.status(422).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -81,7 +81,7 @@ export default class SemestersController {
       })
     } catch (error) {
       return response.status(422).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }

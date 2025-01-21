@@ -9,16 +9,16 @@ export function useSemester() {
 }
 
 const SemesterProvider = ({...props}) => {
-    const [semesters, setSemesters] = useState([]);
+    const [semester, setSemester] = useState([]);
 
     useEffect(() => {
         getSemesters({active: true}).then(resp => {
-            setSemesters(resp.data.result);
+            setSemester(resp.data.result);
         }).catch(err => RToast(err, 'error'));
-    }, [])
+    }, []);
 
     return (
-        <SemesterContext.Provider value={semesters}>
+        <SemesterContext.Provider value={[semester, setSemester]}>
             {props.children}
         </SemesterContext.Provider>
     )

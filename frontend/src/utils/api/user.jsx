@@ -16,7 +16,7 @@ function show(params) {
     const baseUrl = `/user/${params.id}`
     return api.get(`${baseUrl}`)
 }
-function update(params: {id: string, name: string, username: string, password: string, email: string, role: string}) {
+function update(params: {id: string, name: string, username: string, password: string, password_confirmation: string, email: string, role: string}) {
     const baseUrl = `/user/${params.id}`
     return api.update(`${baseUrl}`, params)
 }

@@ -11,7 +11,7 @@ export default class UsersController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -27,7 +27,7 @@ export default class UsersController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.messages[0].message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -57,7 +57,7 @@ export default class UsersController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }
@@ -72,7 +72,7 @@ export default class UsersController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }

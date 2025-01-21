@@ -15,6 +15,9 @@ const Recapitulation = React.lazy(() => import('../pages/recapitulation'));
 
 const HeadDashboard = React.lazy(() => import('../pages/dashboard'));
 const TeacherDashboard = React.lazy(() => import('../pages/dashboard'));
+const EditTeacher = React.lazy(() => import('../pages/teacher/Edit'));
+const EditUser = React.lazy(() => import('../pages/user/Edit'));
+const Permission = React.lazy(() => import('../pages/presence/Permission'));
 
 const Login = React.lazy(() => import('../pages/auth/Login'));
 const Logout = React.lazy(() => import('../pages/auth/Logout'));
@@ -44,6 +47,9 @@ const headRoute = [
 
 const teacherRoute = [
     {path: '/guru', name: 'Dashboard', element: <TeacherDashboard />},
+    {path: '/guru/ubah', name: 'Dashboard', element: <EditTeacher />},
+    {path: '/guru/absensi/perijinan', name: 'Dashboard', element: <Permission />},
+    {path: '/pengaturan-pengguna', name: 'Pengaturan Pengguna', element: <EditUser />}
 ]
 
 export const protectedRoutes = [

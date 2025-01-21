@@ -42,7 +42,7 @@ const School = () => {
       RToast(resp.data.message, 'success')
       setLoading(false)
     }).catch((err) => {
-      RToast(err.messages[0].message, 'error')
+      RToast(err, 'error')
       setLoading(false)
     })
   }

@@ -13,8 +13,8 @@ export default class Holiday extends BaseModel {
   @column()
   declare name: string
 
-  @column()
-  declare date: Date
+  @column.date()
+  declare date: DateTime
 
   @column()
   declare description: string

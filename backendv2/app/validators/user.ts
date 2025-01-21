@@ -16,10 +16,7 @@ export const updateUserValidator = vine.compile(
   vine.object({
     id: vine.number(),
     name: vine.string(),
-    username: vine.string().unique({
-      table: 'users',
-      column: 'username',
-    }),
+    username: vine.string(),
     email: vine.string().email(),
     password: vine.string().confirmed(),
     role: vine.string(),

@@ -60,11 +60,6 @@ const menu = [
         icon: "users",
         text: "Pengguna",
         link: "/pengguna",
-    },
-    {
-        icon: "setting-alt",
-        text: "Pengaturan",
-        link: "/pengaturan",
-    },
+    }
 ];
 export default menu;

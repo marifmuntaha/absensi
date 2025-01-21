@@ -46,15 +46,15 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
     }
 
     const menuHeight = (el) => {
-        var totalHeight = [];
-        for (var i = 0; i < el.length; i++) {
-            var margin =
+        let totalHeight = [];
+        for (let i = 0; i < el.length; i++) {
+            let margin =
                 parseInt(window.getComputedStyle(el[i]).marginTop.slice(0, -2)) +
                 parseInt(window.getComputedStyle(el[i]).marginBottom.slice(0, -2));
-            var padding =
+            let padding =
                 parseInt(window.getComputedStyle(el[i]).paddingTop.slice(0, -2)) +
                 parseInt(window.getComputedStyle(el[i]).paddingBottom.slice(0, -2));
-            var height = el[i].clientHeight + margin + padding;
+            let height = el[i].clientHeight + margin + padding;
             totalHeight.push(height);
         }
         totalHeight = totalHeight.reduce((sum, value) => (sum += value));
@@ -73,8 +73,8 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
     };
 
     useEffect(() => {
-        var element = document.getElementsByClassName("nk-menu-item active current-page");
-        var arrayElement = [...element];
+        let element = document.getElementsByClassName("nk-menu-item active current-page");
+        let arrayElement = [...element];
 
         arrayElement.forEach((dom) => {
             if (dom.parentElement.parentElement.parentElement.classList[0] === "nk-menu-item") {
@@ -88,34 +88,34 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
 
     const menuToggle = (e) => {
         e.preventDefault();
-        var self = e.target.closest(".nk-menu-toggle");
-        var parent = self.parentElement;
-        var subMenu = self.nextSibling;
-        var subMenuItem = subMenu.childNodes;
-        var parentSiblings = parent.parentElement.childNodes;
-        var parentMenu = parent.closest(".nk-menu-wrap");
+        let self = e.target.closest(".nk-menu-toggle");
+        let parent = self.parentElement;
+        let subMenu = self.nextSibling;
+        let subMenuItem = subMenu.childNodes;
+        let parentSiblings = parent.parentElement.childNodes;
+        let parentMenu = parent.closest(".nk-menu-wrap");
         //For Sub Menu Height
-        var subMenuHeight = menuHeight(subMenuItem);
+        let subMenuHeight = menuHeight(subMenuItem);
         // Get parent elements
         const getParents = (el, parentSelector) => {
             parentSelector = document.querySelector(".nk-menu");
             if (parentSelector === undefined) {
                 parentSelector = document;
             }
-            var parents = [];
-            var p = el.parentNode;
+            let parents = [];
+            let p = el.parentNode;
             while (p !== parentSelector) {
-                var o = p;
+                let o = p;
                 parents.push(o);
                 p = o.parentNode;
             }
             parents.push(parentSelector);
             return parents;
         };
-        var parentMenus = getParents(self);
+        let parentMenus = getParents(self);
         if (!parent.classList.contains("active")) {
             // For Parent Siblings
-            for (var j = 0; j < parentSiblings.length; j++) {
+            for (let j = 0; j < parentSiblings.length; j++) {
                 parentSiblings[j].classList.remove("active");
                 if (typeof parentSiblings[j].childNodes[1] !== "undefined") {
                     parentSiblings[j].childNodes[1].style.height = 0;
@@ -125,7 +125,7 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
                 if (!parentMenu.classList.contains("sub-opened")) {
                     parentMenu.classList.add("sub-opened");
 
-                    for (var l = 0; l < parentMenus.length; l++) {
+                    for (let l = 0; l < parentMenus.length; l++) {
                         if (typeof parentMenus !== "undefined") {
                             if (parentMenus[l].classList.contains("nk-menu-wrap")) {
                                 parentMenus[l].style.height = subMenuHeight + parentMenus[l].clientHeight + "px";
@@ -141,7 +141,7 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
             parent.classList.remove("active");
             if (parentMenu !== null) {
                 parentMenu.classList.remove("sub-opened");
-                for (var k = 0; k < parentMenus.length; k++) {
+                for (let k = 0; k < parentMenus.length; k++) {
                     if (typeof parentMenus !== "undefined") {
                         if (parentMenus[k].classList.contains("nk-menu-wrap")) {
                             parentMenus[k].style.height = parentMenus[k].clientHeight - subMenuHeight + "px";

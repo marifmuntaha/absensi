@@ -1,11 +1,14 @@
 import vine from '@vinejs/vine'
+import { DateTime } from 'luxon'
 
 export const storePresenceValidator = vine.compile(
   vine.object({
     teacher_id: vine.number(),
-    date: vine.date({
-      formats: 'YYYY-MM-DD',
-    }),
+    date: vine
+      .date({
+        formats: 'YYYY-MM-DD',
+      })
+      .transform((date) => DateTime.fromJSDate(date)),
     in: vine.date({
       formats: 'HH:mm:ss',
     }),
@@ -23,7 +26,11 @@ export const updatePresenceValidator = vine.compile(
   vine.object({
     id: vine.number(),
     teacherId: vine.number(),
-    date: vine.date(),
+    date: vine
+      .date({
+        formats: 'YYYY-MM-DD',
+      })
+      .transform((date) => DateTime.fromJSDate(date)),
     in: vine.date({
       formats: 'HH:mm:ss',
     }),

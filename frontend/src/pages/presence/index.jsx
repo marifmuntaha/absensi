@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import Head from "../../layout/head";
 import {
     Block,
-    BlockBetween,
     BlockHead,
     BlockHeadContent,
     BlockTitle,
@@ -18,8 +17,8 @@ import {useSemester} from "../../layout/provider/Semester";
 import {useYear} from "../../layout/provider/Year";
 
 const Presence = () => {
-    const year = useYear();
-    const semester = useSemester();
+    const [year] = useYear();
+    const [semester] = useSemester();
     const navigate = useNavigate();
     const [month, setMonth] = useState([]);
     useEffect(() => {
@@ -32,6 +31,7 @@ const Presence = () => {
         }
         setMonth(monthData);
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
         <React.Fragment>

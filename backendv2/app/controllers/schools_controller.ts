@@ -33,7 +33,7 @@ export default class SchoolsController {
       })
     } catch (error) {
       return response.status(422).json({
-        message: error,
+        message: error.messages ? error.messages[0].message : error,
       })
     }
   }

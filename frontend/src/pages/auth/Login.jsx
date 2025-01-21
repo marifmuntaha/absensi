@@ -18,6 +18,7 @@ import {useForm} from "react-hook-form";
 import {Link, useNavigate} from "react-router-dom";
 import {APICore, setAuthorization} from "../../utils/api/APICore";
 import {login} from "../../utils/api/auth"
+import {get as getTeacher} from "../../utils/api/teacher"
 
 const Login = () => {
     const api = new APICore();
@@ -38,6 +39,11 @@ const Login = () => {
             const {user, token} = resp.data.result;
             user.token = token.token
             user.expired = token.expiresAt;
+            if (user.role === '3') {
+                getTeacher({userId: user.id}).then(resp => {
+                    localStorage.setItem('teacher', JSON.stringify(resp.data.result.pop()))
+                }).catch(err => RToast(err, 'error'));
+            }
             api.setLoggedInUser(user);
             setAuthorization(user.token);
             setLoading(false);

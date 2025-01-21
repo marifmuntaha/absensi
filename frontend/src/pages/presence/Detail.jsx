@@ -115,8 +115,8 @@ const Detail = () => {
                                     }
                                 })}
                                 <td rowSpan={2} className="bg-success">H</td>
-                                <td rowSpan={2} className="bg-info">S</td>
-                                <td rowSpan={2} className="bg-warning">I</td>
+                                <td rowSpan={2} className="bg-info">I</td>
+                                <td rowSpan={2} className="bg-warning">S</td>
                                 <td rowSpan={2} className="bg-danger">A</td>
                             </tr>
                             <tr className="text-center fw-bold">
@@ -161,7 +161,6 @@ const Detail = () => {
                                           const presence = item.presences.filter((value) => {
                                               return moment(value.date, 'YYYY-MM-DD').date().toString() === day;
                                           })
-                                          console.log(presence)
                                           if (presence.length > 0 && !holidays.includes(day) && !getWeekday(day)) {
                                               return (
                                                 <React.Fragment key={idx}>

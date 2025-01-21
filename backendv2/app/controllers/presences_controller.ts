@@ -7,8 +7,8 @@ export default class PresencesController {
   async index({ request, response }: HttpContext) {
     try {
       const presence = Presence.query()
-      if (request.input('teacher_id')) {
-        presence.where('teacherId', request.input('teacher_id'))
+      if (request.input('teacherId')) {
+        presence.where('teacherId', request.input('teacherId'))
       }
       if (request.input('month') && request.input('year')) {
         const { month, year } = request.all()
