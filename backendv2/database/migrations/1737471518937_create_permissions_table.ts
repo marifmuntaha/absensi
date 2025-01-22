@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.enum('status', ['I', 'S'])
       table.string('description')
       table.string('letter')
-      table.enum('accept', ['1', '2']).defaultTo('2')
+      table.enum('accept', ['1', '2', '3']).defaultTo('2')
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

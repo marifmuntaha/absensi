@@ -9,14 +9,14 @@ export default class extends BaseSeeder {
     let query = []
     while (startDate.isBefore(endDate)) {
       query.push({
-        teacherId: 41,
+        teacherId: 2,
         date: startDate.format('YYYY-MM-DD'),
         in: '07:00:00',
         out: '13:30:00',
         statusIn: 'H',
         statusOut: 'H',
         description: '',
-        latter: '',
+        letter: '',
       })
       startDate.add(1, 'days')
     }

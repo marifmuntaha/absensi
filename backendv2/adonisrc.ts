@@ -51,7 +51,7 @@ export default defineConfig({
   preloads: [() => import('#start/routes'), () => import('#start/kernel'), () => import('#start/validator'), {
     file: () => import('#start/scheduler'),
     environment: ['console'],
-  }],
+  }, () => import('#start/events')],
 
   /*
   |--------------------------------------------------------------------------

@@ -22,15 +22,12 @@ export const updatePermissionValidator = vine.compile(
     teacherId: vine.number(),
     date: vine
       .date({
-        formats: 'yyyy-MM-dd',
+        formats: ['YYYY-MM-DD'],
       })
       .transform((date) => DateTime.fromJSDate(date)),
     status: vine.string(),
     description: vine.string(),
-    file: vine.file({
-      extnames: ['jpg', 'png', 'jpeg'],
-      size: '512kb',
-    }),
+    letter: vine.string().optional(),
     accept: vine.string().optional(),
   })
 )

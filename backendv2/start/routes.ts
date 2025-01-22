@@ -12,6 +12,7 @@ import { middleware } from '#start/kernel'
 
 const AuthController = () => import('#controllers/auth_controller')
 const HolidayController = () => import('#controllers/holidays_controller')
+const NotificationController = () => import('#controllers/notifications_controller')
 const PermissionController = () => import('#controllers/permissions_controller')
 const PresenceController = () => import('#controllers/presences_controller')
 const SchoolController = () => import('#controllers/schools_controller')
@@ -50,6 +51,7 @@ router
             router.resource('year', YearController).apiOnly()
           })
           .prefix('master')
+        router.resource('notification', NotificationController).only(['index', 'update'])
         router.resource('permission', PermissionController).apiOnly()
         router.resource('presence', PresenceController).apiOnly()
         router.resource('teacher', TeacherController).apiOnly()

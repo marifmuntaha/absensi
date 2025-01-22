@@ -8,7 +8,7 @@ import {get as getWorks} from "../../../utils/api/work";
 const TeacherButton = () => {
     const teacher = JSON.parse(localStorage.getItem("teacher"));
     const [loading, setLoading] = useState(false);
-    const [time, setTime] = useState()
+    const [time, setTime] = useState();
     const onSubmit = (e) => {
         e.preventDefault()
         setLoading(true)
@@ -19,8 +19,8 @@ const TeacherButton = () => {
                 return item.day === moment().day().toString();
             }).pop()
             const startTimeIn = mutationTime(timeInDay.in, -1);
-            const endTimeIn = mutationTime(timeInDay.out, -1);
-            const startTimeEnd = mutationTime(timeInDay.in, 4);
+            const endTimeIn = mutationTime(timeInDay.in, 2);
+            const startTimeEnd = mutationTime(timeInDay.out, -1);
             const endTimeEnd = mutationTime(timeInDay.out, 3);
             if (moment().toDate() < startTimeIn.toDate()){
                 RToast('Absensi masuk belum dimulai.', 'error');
@@ -34,6 +34,7 @@ const TeacherButton = () => {
                         presence.in = moment().format('HH:mm:ss');
                         updatePresence(presence).then(() => {
                             RToast('Presensi Masuk berhasil disimpan.', 'success')
+                            setLoading(false);
                         }).catch(err => {
                             RToast(err, 'error');
                             setLoading(false);
@@ -45,6 +46,7 @@ const TeacherButton = () => {
                 }
                 else if (endTimeIn.toDate() < moment().toDate() && moment().toDate() < startTimeEnd.toDate()) {
                     RToast('Absensi pulang belum dimulai.', 'error');
+                    setLoading(false);
                 }
                 else if (startTimeEnd.toDate() < moment().toDate() && moment().toDate() < endTimeEnd.toDate()){
                     getPresence({date: moment().format("YYYY-MM-DD"), teacher_id: teacher.id}).then(resp => {
@@ -54,6 +56,7 @@ const TeacherButton = () => {
                         presence.Out = moment().format('HH:mm:ss');
                         updatePresence(presence).then(() => {
                             RToast('Presensi Pulang berhasil disimpan.', 'success')
+                            setLoading(false)
                         }).catch(err => {
                             RToast(err, 'error')
                             setLoading(false)
@@ -74,7 +77,7 @@ const TeacherButton = () => {
     const mutationTime = (time, value) => {
         return moment(time, 'HH : mm : ss').add(value, 'hours');
     }
-    
+
     useEffect(() => {
         setInterval(() => {
             setTime(moment().format('HH:mm:ss'));
@@ -99,7 +102,7 @@ const TeacherButton = () => {
                 <Block className="mt-3">
                     <div className="form-group">
                         <Button size="xl" className="btn-block" color="success" onClick={(e) => onSubmit(e)}>
-                            {loading ? <Spinner size="md" color="light"/> : "HADIR"}
+                            {loading ? <Spinner size="sm" color="light"/> : "HADIR"}
                         </Button>
                     </div>
                 </Block>

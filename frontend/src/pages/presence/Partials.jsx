@@ -29,7 +29,7 @@ const Partials = ({...props}) => {
             description: getValues('description'),
         }
         if (file !== null) {
-            params.file = file
+            params.image = file
         }
         await storePermission(params).then(resp => {
             RToast(resp.data.message, 'success');
@@ -39,22 +39,26 @@ const Partials = ({...props}) => {
     }
     const updateSubmit = async () => {
         setLoading(true);
-        // const params = {
-        //     id: getValues('id'),
-        //     name: getValues('name'),
-        //     description: getValues('description'),
-        //     active: getValues('active'),
-        // }
-        // await updateYear(params).then(resp => {
-        //     RToast(resp.data.message, 'success');
-        //     toggle();
-        //     props.setLoadData(true);
-        //     resp.data.result.active === '1' && setYear(resp.data.result);
-        // }).catch(err => RToast(err, 'error'));
+        const params = {
+            id: getValues('id'),
+            teacherId: teacher.id,
+            date: moment().format('YYYY-MM-DD'),
+            status: getValues('status'),
+            description: getValues('description'),
+        }
+        if (file !== null) {
+            params.image = file
+        }
+        await updatePermission(params).then(resp => {
+            RToast(resp.data.message, 'success');
+            toggle();
+            props.setLoadData(true);
+        }).catch(err => RToast(err, 'error'));
     }
     const toggle = () => {
         reset();
-        setValue('active', null);
+        setValue('status', null);
+        setValue('image', null);
         props.setPermission(null);
         props.setModal(false);
     }
@@ -80,6 +84,22 @@ const Partials = ({...props}) => {
                 <ModalBody>
                     <form className="form-validate is-alter" onSubmit={handleSubmit(onSubmit)}>
                         <Row className="gy-2">
+                            <Col className="col-md-12">
+                                <div className="form-group">
+                                    <Label htmlFor="date" className="form-label">Tanggal</Label>
+                                    <div className="form-control-wrap">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="date"
+                                            value={moment(getValues('date')).format('DD-MM-YYYY').toString()}
+                                            disabled={true}
+                                            {...register('date', {required: false})}
+                                        />
+                                        {errors.date && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                                    </div>
+                                </div>
+                            </Col>
                             <Col className="col-md-12">
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="user">
@@ -121,15 +141,16 @@ const Partials = ({...props}) => {
                             </Col>
                             <Col className="col-md-12">
                                 <div className="form-group">
-                                    <Label htmlFor="letter" className="form-label">Surat Ijin</Label>
+                                    <Label htmlFor="image" className="form-label">Surat Ijin</Label>
                                     <div className="form-control-wrap">
                                         <input
                                             className="form-control"
                                             type="file"
-                                            id="letter"
-                                            onChange={(e) => setFile(e.target.files[0]) }
+                                            id="image"
+                                            onChange={(e) => {
+                                                setFile(e.target.files[0]);
+                                            } }
                                         />
-                                        {errors.letter && <span className="invalid">Kolom tidak boleh kosong.</span>}
                                     </div>
                                 </div>
                             </Col>

@@ -1,5 +1,5 @@
 import React, {Suspense, useEffect, useState} from "react";
-import {BlockContent, BlockDes, BlockHead, BlockTitle, PreviewCard} from "../../../components";
+import {Block, BlockContent, BlockDes, BlockHead, BlockTitle, Col, PreviewCard} from "../../../components";
 import moment from "moment/moment";
 import {Alert, Card} from "reactstrap";
 import ImageContainer from "../../../components/partials/galery";
@@ -21,15 +21,15 @@ const TeacherQR = () => {
                         <BlockTitle className="text-info">{moment(new Date()).locale('id').format('dddd, DD MMMM YYYY')}</BlockTitle>
                         <BlockTitle className="text-danger">{time}</BlockTitle>
                         <BlockDes>
-                            <Alert className="alert-icon" color="info">
+                            <Alert color="info">
                                 <p className="fw-bold fs-6">Silahkan arahkan QRCode Dibawah ini ke scanner</p>
                             </Alert>
                         </BlockDes>
                     </BlockContent>
                 </BlockHead>
-                <Card className="border border-3 border-info col-md-6 offset-3">
+                <Col className="border border-3 border-info align-self-center">
                     <ImageContainer img={teacher.qrcode} />
-                </Card>
+                </Col>
             </PreviewCard>
         </Suspense>
     )

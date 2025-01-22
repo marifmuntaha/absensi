@@ -22,8 +22,8 @@ const TeacherScan = () => {
                 return item.day === moment().day().toString();
             }).pop()
             const startTimeIn = mutationTime(timeInDay.in, -1);
-            const endTimeIn = mutationTime(timeInDay.out, -1);
-            const startTimeEnd = mutationTime(timeInDay.in, 4);
+            const endTimeIn = mutationTime(timeInDay.in, 2);
+            const startTimeEnd = mutationTime(timeInDay.out, -1);
             const endTimeEnd = mutationTime(timeInDay.out, 3);
             if (moment().toDate() < startTimeIn.toDate()){
                 RToast('Absensi masuk belum dimulai.', 'error');
@@ -125,7 +125,7 @@ const TeacherScan = () => {
                         <BlockTitle className="text-primary">{moment(new Date()).locale('id').format('dddd, DD MMMM YYYY')}</BlockTitle>
                         <BlockTitle className="text-primary">{time}</BlockTitle>
                         <BlockDes>
-                            <Alert className="alert-icon" color="danger">
+                            <Alert color="danger">
                                 <p className="fw-bold fs-6">Arahkan Kamera ke QRCode Absensi</p>
                             </Alert>
                         </BlockDes>

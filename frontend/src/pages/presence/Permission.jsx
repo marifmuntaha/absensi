@@ -1,4 +1,4 @@
-import React, {Suspense, useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import Head from "../../layout/head";
 import Content from "../../layout/content";
 import {
@@ -14,42 +14,48 @@ import {
 } from "../../components";
 import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
-import {destroy as destroyYear} from "../../utils/api/year";
 import Partials from "./Partials";
+import {get as getPermision,destroy as destroyPermission} from "../../utils/api/permission"
+import moment from "moment";
+import "moment/locale/id"
 
 const Permission = () => {
-    const [sm, updateSm] = useState(false);
     const [modal, setModal] = useState(false);
     const [permissions, setPermissions] = useState([]);
-    const [permission, setPermission] = useState({});
+    const [permission, setPermission] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loadData, setLoadData] = useState(true);
     const Columns = [
         {
-            name: "Nama Tahun",
-            selector: (row) => row.name,
+            name: "Tanggal",
+            selector: (row) => moment(row.date).locale('id').format('DD/MM/YYYY'),
             sortable: false,
         },
         {
-            name: "Diskripsi",
+            name: "Perijinan",
+            selector: (row) => (row.status === 'I' ? 'Ijin' : 'Sakit'),
+            sortable: false,
+            hide: 'sm',
+        },
+        {
+            name: "Keterangan",
             selector: (row) => row.description,
             sortable: false,
-            hide: 370,
+            hide: "sm",
         },
         {
             name: "Status",
-            selector: (row) => row.active,
+            selector: (row) => row.accept,
             sortable: false,
-            hide: "sm",
             cell: (row) => {
-                return row.active === '1' ? <Badge pill color="success">Aktif</Badge> : <Badge pill color="danger">Tdk Aktif</Badge>;
+                return row.accept === '1' ? <Badge pill color="success">Disetujui</Badge> : <Badge pill color="warning">Pengajuan</Badge>;
             },
         },
         {
             name: "Aksi",
             selector: (row) => row.id,
             sortable: false,
-            hide: "sm",
+            hide: 'sm',
             cell: (row) => (
                 <ButtonGroup size="sm">
                     <Button outline color="warning" onClick={() => {
@@ -58,9 +64,10 @@ const Permission = () => {
                     }}><Icon name="edit-alt"/></Button>
                     <Button outline color="danger" onClick={() => {
                         setLoading(row.id);
-                        destroyYear(row.id).then(resp => {
+                        destroyPermission(row.id).then(resp => {
                             RToast(resp.data.message, 'success');
                             setLoadData(true);
+                            setLoading(false)
                         }).catch(err => {
                             RToast(err, 'error')
                             setLoading(false)
@@ -70,6 +77,16 @@ const Permission = () => {
             )
         },
     ];
+
+    useEffect(() => {
+        loadData && getPermision().then(resp => {
+            setPermissions(resp.data.result);
+            setLoadData(false);
+        }).catch(err => {
+            RToast(err, 'error');
+            setLoadData(false);
+        })
+    }, [loadData]);
     return (
         <Suspense fallback={<div>Loading..</div>}>
             <Head title="Data Perijinan" />
@@ -92,28 +109,18 @@ const Permission = () => {
                             </BlockHeadContent>
                             <BlockHeadContent>
                                 <div className="toggle-wrap nk-block-tools-toggle">
-                                    <a
-                                        href="#more"
-                                        className="btn btn-icon btn-trigger toggle-expand me-n1"
-                                        onClick={(ev) => {
-                                            ev.preventDefault();
-                                            updateSm(!sm);
+                                    <Button
+                                        className="toggle btn-icon d-md-none"
+                                        color="dark"
+                                        onClick={() => {
+                                            setModal(true);
                                         }}
                                     >
-                                        <Icon name="more-v"></Icon>
-                                    </a>
-                                    <div className="toggle-expand-content" style={{display: sm ? "block" : "none"}}>
+                                        <Icon name="plus"></Icon>
+                                    </Button>
+                                    <div className="toggle-expand-content">
                                         <ul className="nk-block-tools g-3">
                                             <li className="nk-block-tools-opt">
-                                                <Button
-                                                    className="toggle btn-icon d-md-none"
-                                                    color="dark"
-                                                    onClick={() => {
-                                                        setModal(true);
-                                                    }}
-                                                >
-                                                    <Icon name="plus"></Icon>
-                                                </Button>
                                                 <Button
                                                     className="toggle d-none d-md-inline-flex"
                                                     color="dark"
@@ -132,7 +139,7 @@ const Permission = () => {
                         </BlockBetween>
                     </BlockHead>
                     <PreviewCard>
-                        <ReactDataTable data={permissions} columns={Columns} expandableRows pagination/>
+                        <ReactDataTable data={permissions} columns={Columns} expandableRows pagination />
                     </PreviewCard>
                 </Block>
             </Content>

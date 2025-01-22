@@ -50,6 +50,7 @@ const Recapitulation = () => {
         {value: '2028', label: '2028'},
         {value: '2029', label: '2029'},
     ];
+
     useEffect(() => {
         getTeacher().then(resp => {
             setTeachers(resp.data.result)
@@ -83,7 +84,7 @@ const Recapitulation = () => {
             });
             setHolidayCount(holidays?.length)
             setActiveCount(lastDate ? parseInt(lastDate) - holidays?.length : 0)
-            getPresence({teacher_id: teacher?.id, month: getValues('month'), year: getValues('year')}).then(resp => {
+            getPresence({teacherId: teacher?.id, month: getValues('month'), year: getValues('year')}).then(resp => {
                 const presences = resp.data.result
                 setPresentCount(() => {
                     return presences.filter((item) => {

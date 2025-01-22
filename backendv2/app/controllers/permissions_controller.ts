@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Permission from '#models/permission'
 import { storePermissionValidator, updatePermissionValidator } from '#validators/permission'
 import drive from '@adonisjs/drive/services/main'
+import { randomUUID } from 'node:crypto'
+import emitter from '@adonisjs/core/services/emitter'
 
 export default class PermissionsController {
   async index({ request, response }: HttpContext) {
@@ -24,14 +26,15 @@ export default class PermissionsController {
   async store({ request, response }: HttpContext) {
     try {
       const data = request.all()
-      const file = request.file('file')
+      const file = request.file('image')
       const payload = await storePermissionValidator.validate(data)
       if (file) {
-        const key = `images/teacher/permission/${payload.teacherId}-${payload.date}.${file.extname}`
+        const key = `images/teacher/permission/${payload.teacherId}-${randomUUID()}.${file.extname}`
         await file.moveToDisk(key)
         payload.letter = await drive.use().getUrl(key)
       }
-      const createPermission = Permission.create(payload)
+      const createPermission = await Permission.create(payload)
+      await emitter.emit('permission:store', createPermission)
       return response.status(201).json({
         message: 'Data Perijinan berhasil diajukan.',
         result: createPermission,
@@ -73,7 +76,7 @@ export default class PermissionsController {
     }
   }
 
-  async delete({ params, response }: HttpContext) {
+  async destroy({ params, response }: HttpContext) {
     try {
       const permission = await Permission.findOrFail(params.id)
       await permission.delete()

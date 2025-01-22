@@ -32,6 +32,7 @@ export default class HolidaysController {
     try {
       const data = request.all()
       const payload = await storeHolidayValidator.validate(data)
+      // @ts-ignore
       const createHoliday = await Holiday.create(payload)
       return response.status(201).json({
         message: 'Hari Libur berhasil disimpan.',
@@ -62,6 +63,7 @@ export default class HolidaysController {
       const data = request.all()
       const payload = await updateHolidayValidator.validate(data)
       const holiday = await Holiday.findOrFail(payload.id)
+      // @ts-ignore
       const updateHoliday = await holiday.fill(payload).save()
       return response.status(200).json({
         message: 'Hari Libur berhasil diperbarui.',

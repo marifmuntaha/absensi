@@ -7,18 +7,18 @@ function get(params) {
     return api.get(`${baseUrl}`, params)
 }
 
-function store(params: {teacherId: string, date: string, status: string, description: string, letter: string, accept: string}) {
+function store(params: {teacherId: string, date: string, status: string, description: string, image: {}, accept: string}) {
     const baseUrl = '/permission'
-    return api.create(baseUrl, params)
+    return api.createWithFile(baseUrl, params)
 }
 
 function show(params) {
     const baseUrl = `/permission/${params.id}`
     return api.get(`${baseUrl}`)
 }
-function update(params: {id: string, teacherId: string, date: string, status: string, description: string, letter: string, accept: string}) {
+function update(params: {id: string, teacherId: string, date: string, status: string, description: string, image: {}, accept: string}) {
     const baseUrl = `/permission/${params.id}`
-    return api.update(`${baseUrl}`, params)
+    return api.updateWithFile(`${baseUrl}`, params)
 }
 function destroy(params) {
     const baseUrl = `/permission/${params}`

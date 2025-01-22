@@ -30,6 +30,7 @@ export default class Permission extends BaseModel {
     localKey: 'teacherId',
   })
   declare teacher: HasOne<typeof Teacher>
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

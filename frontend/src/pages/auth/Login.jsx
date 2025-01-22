@@ -38,6 +38,7 @@ const Login = () => {
         await login(params).then(resp => {
             const {user, token} = resp.data.result;
             user.token = token.token
+            // noinspection JSUnresolvedReference
             user.expired = token.expiresAt;
             if (user.role === '3') {
                 getTeacher({userId: user.id}).then(resp => {
@@ -48,7 +49,7 @@ const Login = () => {
             setAuthorization(user.token);
             setLoading(false);
             setRedirect(true);
-            
+
         }).catch(err => {
             RToast(err, 'error');
             setLoading(false);
@@ -57,6 +58,7 @@ const Login = () => {
     useEffect(() => {
         if (redirect && api.isUserAuthenticated()) {
             const user = api.getLoggedInUser();
+            // noinspection JSUnresolvedReference
             switch (user.role) {
                 case "1":
                     return navigate('/administrator');
@@ -133,7 +135,7 @@ const Login = () => {
                         </div>
                         <div className="form-group">
                             <Button size="lg" className="btn-block" type="submit" color="primary">
-                                {loading ? <Spinner size="sm" color="light"/> : "Sign in"}
+                                {loading ? <Spinner size="sm" color="light"/> : "MASUK"}
                             </Button>
                         </div>
                     </Form>

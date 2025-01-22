@@ -21,8 +21,8 @@ const OperatorScan = () => {
                 return item.day === moment().day().toString();
             }).pop()
             const startTimeIn = mutationTime(timeInDay.in, -1);
-            const endTimeIn = mutationTime(timeInDay.out, -1);
-            const startTimeEnd = mutationTime(timeInDay.in, 4);
+            const endTimeIn = mutationTime(timeInDay.in, 2);
+            const startTimeEnd = mutationTime(timeInDay.out, -1);
             const endTimeEnd = mutationTime(timeInDay.out, 3);
             if (moment().toDate() < startTimeIn.toDate()){
                 RToast('Absensi masuk belum dimulai.', 'error');

@@ -49,7 +49,8 @@ const teacherRoute = [
     {path: '/guru', name: 'Dashboard', element: <TeacherDashboard />},
     {path: '/guru/ubah', name: 'Dashboard', element: <EditTeacher />},
     {path: '/guru/absensi/perijinan', name: 'Dashboard', element: <Permission />},
-    {path: '/pengaturan-pengguna', name: 'Pengaturan Pengguna', element: <EditUser />}
+    {path: '/guru/absensi/rekapitulasi', name: 'Dashboard', element: <Recapitulation />},
+    {path: '/guru/pengaturan-pengguna', name: 'Pengaturan Pengguna', element: <EditUser />}
 ]
 
 export const protectedRoutes = [
