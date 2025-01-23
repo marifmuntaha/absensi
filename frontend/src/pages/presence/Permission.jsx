@@ -15,7 +15,7 @@ import {
 import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
 import Partials from "./Partials";
-import {get as getPermision,destroy as destroyPermission} from "../../utils/api/permission"
+import {get as getPermission,destroy as destroyPermission} from "../../utils/api/permission"
 import moment from "moment";
 import "moment/locale/id"
 
@@ -35,13 +35,13 @@ const Permission = () => {
             name: "Perijinan",
             selector: (row) => (row.status === 'I' ? 'Ijin' : 'Sakit'),
             sortable: false,
-            hide: 'sm',
+            // hide: 'sm',
         },
         {
             name: "Keterangan",
             selector: (row) => row.description,
             sortable: false,
-            hide: "sm",
+            hide: 400,
         },
         {
             name: "Status",
@@ -55,7 +55,7 @@ const Permission = () => {
             name: "Aksi",
             selector: (row) => row.id,
             sortable: false,
-            hide: 'sm',
+            // hide: 'sm',
             cell: (row) => (
                 <ButtonGroup size="sm">
                     <Button outline color="warning" onClick={() => {
@@ -79,7 +79,7 @@ const Permission = () => {
     ];
 
     useEffect(() => {
-        loadData && getPermision().then(resp => {
+        loadData && getPermission().then(resp => {
             setPermissions(resp.data.result);
             setLoadData(false);
         }).catch(err => {

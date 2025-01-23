@@ -15,9 +15,13 @@ import {get as getPresence} from "../../utils/api/presence";
 import {get as getHoliday} from "../../utils/api/holiday";
 import moment from "moment";
 import {Spinner} from "reactstrap";
+import {APICore} from "../../utils/api/APICore";
 
 const Recapitulation = () => {
-    const {formState: {errors}, control, getValues, watch} = useForm();
+    const api = new APICore();
+    const user = api.getLoggedInUser();
+    const {formState: {errors}, control, handleSubmit, setValue, getValues, watch} = useForm();
+    const [loading, setLoading] = useState(false);
     const [optionTeachers, setOptionTeachers] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [teacher, setTeacher] = useState({});
@@ -50,25 +54,8 @@ const Recapitulation = () => {
         {value: '2028', label: '2028'},
         {value: '2029', label: '2029'},
     ];
-
-    useEffect(() => {
-        getTeacher().then(resp => {
-            setTeachers(resp.data.result)
-        }).catch(err => RToast(err, 'error'));
-    }, []);
-    useEffect(() => {
-        setOptionTeachers(teachers.map((teacher) => {
-            return {value: teacher.id, label: teacher.name};
-        }))
-    }, [teachers]);
-    useEffect(() => {
-        const teacher = teachers.filter((item) => {
-            return item.id === getValues('teacher');
-        }).pop();
-        setTeacher(teacher);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [watch('teacher')]);
-    useEffect(() => {
+    const onSubmit = async () => {
+        setLoading(true);
         const date = new Date(parseInt(getValues('year')), getValues('month') - 1, 1);
         const lastDate = moment(`${getValues('year')}-${getValues('month')}`, 'YYYY-M').endOf('months').date().toString();
         let result = [];
@@ -78,13 +65,14 @@ const Recapitulation = () => {
             result.push(date.getDate().toString());
             date.setDate(date.getDate() + 1)
         }
-        getHoliday({month: getValues('month'), year: getValues('year')}).then(resp => {
+        await getHoliday({month: getValues('month'), year: getValues('year')}).then(resp => {
             resp.data.result.map((item) => {
                 return holidays.push(moment(item.date).format('D').toString())
             });
             setHolidayCount(holidays?.length)
             setActiveCount(lastDate ? parseInt(lastDate) - holidays?.length : 0)
             getPresence({teacherId: teacher?.id, month: getValues('month'), year: getValues('year')}).then(resp => {
+                setLoading(false);
                 const presences = resp.data.result
                 setPresentCount(() => {
                     return presences.filter((item) => {
@@ -118,11 +106,40 @@ const Recapitulation = () => {
                     }
                 }))
             }).catch(error => {
-                RToast(error, 'error')
+                RToast(error, 'error');
+                setLoading(false)
             })
-        }).catch(err => RToast(err, 'error'));
+        }).catch(err => {
+            RToast(err, 'error');
+            setLoading(false)
+        });
+    }
+
+    useEffect(() => {
+        getTeacher().then(resp => {
+            setTeachers(resp.data.result)
+        }).catch(err => RToast(err, 'error'))
+        // eslint-disable-next-line
+    }, []);
+    useEffect(() => {
+        setOptionTeachers(teachers.map((teacher) => {
+            return {value: teacher.id, label: teacher.name};
+        }))
+        // noinspection JSUnresolvedReference
+        if (user.role === '3') {
+            const teacher = JSON.parse(localStorage.getItem('teacher'));
+            setTeacher(teacher);
+            setValue('teacher', teacher.id)
+        }
+        // eslint-disable-next-line
+    }, [teachers]);
+    useEffect(() => {
+        const teacher = teachers.filter((item) => {
+            return item.id === getValues('teacher');
+        }).pop();
+        setTeacher(teacher);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [watch('month')])
+    }, [watch('teacher')]);
     return (
         <React.Fragment>
             <Head title="Rekapitulasi" />
@@ -137,85 +154,94 @@ const Recapitulation = () => {
                         </BlockHeadContent>
                     </BlockHead>
                     <PreviewCard>
-                        <Row className="gy-2">
-                            <Col className="col-md-4">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="teacher">Guru/Karyawan</label>
-                                    <div className="form-control-wrap">
-                                        <input type="hidden" className="form-control"/>
-                                        <Controller
-                                            control={control}
-                                            className="form-control"
-                                            name="teacher"
-                                            rules={{required: true}}
-                                            render={({field: {onChange, value, ref}}) => (
-                                                <RSelect
-                                                    inputRef={ref}
-                                                    options={optionTeachers}
-                                                    value={optionTeachers && optionTeachers.find((c) => c.value === value)}
-                                                    onChange={(val) => onChange(val.value)}
-                                                    placeholder="Pilih Guru"
-                                                />
-                                            )}/>
-                                        {errors.teacher && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                        <form className="is-alter" onSubmit={handleSubmit(onSubmit)}>
+                            <Row className="gy-2">
+                                <Col className="col-md-3">
+                                    <div className="form-group">
+                                        <div className="form-control-wrap">
+                                            <input type="hidden" className="form-control"/>
+                                            <Controller
+                                                control={control}
+                                                className="form-control"
+                                                name="teacher"
+                                                rules={{required: true}}
+                                                render={({field: {onChange, value, ref}}) => (
+                                                    <RSelect
+                                                        inputRef={ref}
+                                                        options={optionTeachers}
+                                                        value={optionTeachers && optionTeachers.find((c) => c.value === value)}
+                                                        onChange={(val) => onChange(val.value)}
+                                                        placeholder="Pilih Guru"
+                                                        isDisabled={user.role === '3'}
+                                                    />
+                                                )}/>
+                                            {errors.teacher && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                                        </div>
                                     </div>
-                                </div>
-                            </Col>
-                            <Col className="col-md-4">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="year">Tahun</label>
-                                    <div className="form-control-wrap">
-                                        <input type="hidden" className="form-control"/>
-                                        <Controller
-                                            control={control}
-                                            className="form-control"
-                                            name="year"
-                                            rules={{required: true}}
-                                            render={({field: {onChange, value, ref}}) => (
-                                                <RSelect
-                                                    inputRef={ref}
-                                                    options={optionYears}
-                                                    value={optionYears.find((c) => c.value === value)}
-                                                    onChange={(val) => onChange(val.value)}
-                                                    placeholder="Pilih Status"
-                                                />
-                                            )}/>
-                                        {errors.year && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                                </Col>
+                                <Col className="col-md-3">
+                                    <div className="form-group">
+                                        <div className="form-control-wrap">
+                                            <input type="hidden" className="form-control"/>
+                                            <Controller
+                                                control={control}
+                                                className="form-control"
+                                                name="year"
+                                                rules={{required: true}}
+                                                render={({field: {onChange, value, ref}}) => (
+                                                    <RSelect
+                                                        inputRef={ref}
+                                                        options={optionYears}
+                                                        value={optionYears.find((c) => c.value === value)}
+                                                        onChange={(val) => onChange(val.value)}
+                                                        placeholder="Pilih Status"
+                                                    />
+                                                )}/>
+                                            {errors.year && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                                        </div>
                                     </div>
-                                </div>
-                            </Col>
-                            <Col className="col-md-4">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="month">Bulan</label>
-                                    <div className="form-control-wrap">
-                                        <input type="hidden" className="form-control"/>
-                                        <Controller
-                                            control={control}
-                                            className="form-control"
-                                            name="month"
-                                            rules={{required: true}}
-                                            render={({field: {onChange, value, ref}}) => (
-                                                <RSelect
-                                                    inputRef={ref}
-                                                    options={optionMonths}
-                                                    value={optionMonths.find((c) => c.value === value)}
-                                                    onChange={(val) => onChange(val.value)}
-                                                    placeholder="Pilih Status"
-                                                />
-                                            )}/>
-                                        {errors.month && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                                </Col>
+                                <Col className="col-md-3">
+                                    <div className="form-group">
+                                        <div className="form-control-wrap">
+                                            <input type="hidden" className="form-control"/>
+                                            <Controller
+                                                control={control}
+                                                className="form-control"
+                                                name="month"
+                                                rules={{required: true}}
+                                                render={({field: {onChange, value, ref}}) => (
+                                                    <RSelect
+                                                        inputRef={ref}
+                                                        options={optionMonths}
+                                                        value={optionMonths.find((c) => c.value === value)}
+                                                        onChange={(val) => onChange(val.value)}
+                                                        placeholder="Pilih Status"
+                                                    />
+                                                )}/>
+                                            {errors.month && <span className="invalid">Kolom tidak boleh kosong.</span>}
+                                        </div>
                                     </div>
-                                </div>
-                            </Col>
-                        </Row>
+                                </Col>
+                                <Col md={2} sm={12}>
+                                    <div className="form-group">
+                                        <div className="form-control-wrap">
+                                            <Button size="md" className="btn-block" type="submit" color="light">
+                                                {loading ? <Spinner size="sm" color="light"/> : "CARI DATA"}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </Row>
+                        </form>
                     </PreviewCard>
                     <PreviewCard>
                         <Row className="mb-4">
-                            <Col className="col-md-4">
+                            <Col md={4} sm={12}>
                                 <table className="table">
                                     <tbody>
                                     <tr>
-                                        <th style={{width: '200px'}}>Nama Lengkap</th>
+                                        <th>Nama Lengkap</th>
                                         <td>{teacher && teacher.name}</td>
                                     </tr>
                                     <tr>
@@ -236,11 +262,11 @@ const Recapitulation = () => {
                                     </tbody>
                                 </table>
                             </Col>
-                            <Col className="col-md-3">
+                            <Col md={4} sm={12}>
                                 <table className="table">
                                     <tbody>
                                     <tr>
-                                        <th style={{width: '200px'}}>Hadir</th>
+                                        <th>Hadir</th>
                                         <td>{presentCount} Hari</td>
                                     </tr>
                                     <tr>
@@ -258,17 +284,17 @@ const Recapitulation = () => {
                                     </tbody>
                                 </table>
                             </Col>
-                            <Col className="col-md-5">
+                            <Col md={4} sm={12}>
                                 <Row>
                                     <Col className="col-md-12">
                                         <table className="table">
                                             <tbody>
                                             <tr>
                                                 <th>Hari Efektif</th>
-                                                <th>Hari Libur</th>
+                                                <td>{activeCount} Hari</td>
                                             </tr>
                                             <tr>
-                                                <td>{activeCount} Hari</td>
+                                                <th>Hari Libur</th>
                                                 <td>{holidayCount} Hari</td>
                                             </tr>
                                             </tbody>
@@ -276,20 +302,22 @@ const Recapitulation = () => {
                                     </Col>
                                     <Col className="col-md-12 mt-5">
                                         <Row>
-                                            <Col className="col-md-4">
-                                                <Button size="md" className="btn-block" type="submit" color="success">
+                                            <Col className="col-md-4 p-2">
+                                                <Button size="md" className="btn-block " type="submit" color="success">
                                                     <Icon name="printer" />
                                                     <span>CETAK</span>
                                                 </Button>
                                             </Col>
-                                            <Col className="col-md-4">
+                                            <Col className="col-md-4 p-2">
                                                 <Button size="md" className="btn-block" type="submit" color="danger">
                                                     <Icon name="download" />
                                                     <span>UNDUH</span>
                                                 </Button>
                                             </Col>
-                                            <Col className="col-md-4">
-                                                <Button size="md" className="btn-block" type="submit" color="info">
+                                            <Col className="col-md-4 p-2">
+                                                <Button size="md" className="btn-block" type="submit" color="info" onClick={() => {
+                                                    console.log(presences)
+                                                }}>
                                                     <Icon name="checkbox" />
                                                     <span>AJUKAN</span>
                                                 </Button>
@@ -299,7 +327,7 @@ const Recapitulation = () => {
                                 </Row>
                             </Col>
                         </Row>
-                        <table className="table table-bordered">
+                        <table className="table table-bordered overflow-x-scroll">
                             <thead>
                             <tr className="text-center fw-bold" style={{verticalAlign: 'middle'}}>
                                 <td rowSpan={2}>Tanggal</td>

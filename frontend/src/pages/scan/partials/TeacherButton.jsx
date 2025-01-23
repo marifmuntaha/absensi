@@ -26,7 +26,7 @@ const TeacherButton = () => {
                 RToast('Absensi masuk belum dimulai.', 'error');
                 setLoading(false);
             } else {
-                if (startTimeIn.toDate() > moment().toDate() && moment().toDate() < endTimeIn.toDate()){
+                if (startTimeIn.toDate() < moment().toDate() && moment().toDate() < endTimeIn.toDate()){
                     getPresence({date: moment().format("YYYY-MM-DD"), teacher_id: teacher.id}).then(resp => {
                         const presence = resp?.data?.result?.pop();
                         presence.date = moment(presence.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -93,7 +93,7 @@ const TeacherButton = () => {
                         <BlockTitle className="text-primary">{moment(new Date()).locale('id').format('dddd, DD MMMM YYYY')}</BlockTitle>
                         <BlockTitle className="text-primary">{time}</BlockTitle>
                         <BlockDes>
-                            <Alert color="danger">
+                            <Alert fade={false} color="danger">
                                 <p className="fw-bold fs-6">Tekan Tombol dibawah ini untuk melakukan Presensi</p>
                             </Alert>
                         </BlockDes>

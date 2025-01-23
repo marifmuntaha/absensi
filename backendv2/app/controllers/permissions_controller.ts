@@ -8,13 +8,13 @@ import emitter from '@adonisjs/core/services/emitter'
 export default class PermissionsController {
   async index({ request, response }: HttpContext) {
     try {
-      const permision = Permission.query()
+      const permission = Permission.query()
       if (request.input('teacherId')) {
-        permision.where('teacherId', request.input('teacherId'))
+        permission.where('teacherId', request.input('teacherId'))
       }
-      const permisions = await permision.orderBy('date', 'desc')
+      const permissions = await permission.orderBy('date', 'desc')
       return response.status(200).json({
-        result: permisions,
+        result: permissions,
       })
     } catch (error) {
       return response.status(400).json({

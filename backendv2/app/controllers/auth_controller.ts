@@ -12,7 +12,6 @@ export default class AuthController {
       if (user) {
         if (await hash.verify(user.password, payload.password)) {
           const token = await User.accessTokens.create(user)
-          console.log(token)
           return response.status(200).json({
             message: 'Berhasil masuk, anda akan dialihkan dalam 2 detik',
             result: { user, token },
