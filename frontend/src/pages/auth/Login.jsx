@@ -40,13 +40,13 @@ const Login = () => {
             user.token = token.token
             // noinspection JSUnresolvedReference
             user.expired = token.expiresAt;
+            api.setLoggedInUser(user);
+            setAuthorization(user.token);
             if (user.role === '3') {
                 getTeacher({userId: user.id}).then(resp => {
                     localStorage.setItem('teacher', JSON.stringify(resp.data.result.pop()))
                 }).catch(err => RToast(err, 'error'));
             }
-            api.setLoggedInUser(user);
-            setAuthorization(user.token);
             setLoading(false);
             setRedirect(true);
 
@@ -83,7 +83,6 @@ const Login = () => {
                         <img className="logo-dark logo-img logo-img-lg" src={LogoDark} alt="logo-dark"/>
                     </Link>
                 </div>
-
                 <PreviewCard className="card-bordered" bodyClass="card-inner-lg">
                     <BlockHead>
                         <BlockContent>

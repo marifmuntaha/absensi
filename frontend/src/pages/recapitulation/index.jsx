@@ -66,7 +66,8 @@ const Recapitulation = () => {
             date.setDate(date.getDate() + 1)
         }
         await getHoliday({month: getValues('month'), year: getValues('year')}).then(resp => {
-            resp.data.result.map((item) => {
+            const holiday = resp.data.result;
+            holiday.map((item) => {
                 return holidays.push(moment(item.date).format('D').toString())
             });
             setHolidayCount(holidays?.length)
@@ -102,7 +103,10 @@ const Recapitulation = () => {
                         return {id: presences?.id, day: date, in: presences?.in, out: presences?.out, statusIn: presences.statusIn, statusOut: presences.statusOut, description: presences.description, color: 'white'};
                     }
                     else {
-                        return {id: null, day: date, in: null, out: null, statusIn: null, statusOut: null, description: null, color: 'danger'};
+                        const description = holiday.filter((item) => {
+                            return item.date === presences.date
+                        }).pop()
+                        return {id: null, day: date, in: null, out: null, statusIn: null, statusOut: null, description: description?.name, color: 'light'};
                     }
                 }))
             }).catch(error => {
@@ -156,7 +160,7 @@ const Recapitulation = () => {
                     <PreviewCard>
                         <form className="is-alter" onSubmit={handleSubmit(onSubmit)}>
                             <Row className="gy-2">
-                                <Col className="col-md-3">
+                                <Col className="col-md-4">
                                     <div className="form-group">
                                         <div className="form-control-wrap">
                                             <input type="hidden" className="form-control"/>
@@ -227,7 +231,7 @@ const Recapitulation = () => {
                                     <div className="form-group">
                                         <div className="form-control-wrap">
                                             <Button size="md" className="btn-block" type="submit" color="light">
-                                                {loading ? <Spinner size="sm" color="light"/> : "CARI DATA"}
+                                                {loading ? <Spinner size="sm" color="light"/> : "PROSES"}
                                             </Button>
                                         </div>
                                     </div>
@@ -236,9 +240,9 @@ const Recapitulation = () => {
                         </form>
                     </PreviewCard>
                     <PreviewCard>
-                        <Row className="mb-4">
-                            <Col md={4} sm={12}>
-                                <table className="table">
+                        <Row className="mb-2">
+                            <Col md={6} sm={12} className="mb-3">
+                                <table className="table table-bordered table-sm w-100">
                                     <tbody>
                                     <tr>
                                         <th>Nama Lengkap</th>
@@ -262,8 +266,8 @@ const Recapitulation = () => {
                                     </tbody>
                                 </table>
                             </Col>
-                            <Col md={4} sm={12}>
-                                <table className="table">
+                            <Col md={6} sm={12} className="mb-2">
+                                <table className="table table-bordered table-sm w-100">
                                     <tbody>
                                     <tr>
                                         <th>Hadir</th>
@@ -284,83 +288,91 @@ const Recapitulation = () => {
                                     </tbody>
                                 </table>
                             </Col>
-                            <Col md={4} sm={12}>
-                                <Row>
-                                    <Col className="col-md-12">
-                                        <table className="table">
-                                            <tbody>
-                                            <tr>
-                                                <th>Hari Efektif</th>
-                                                <td>{activeCount} Hari</td>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col md={12} sm={12}>
+                                <div className="overflow-auto">
+                                    <table className="table table-bordered">
+                                        <thead>
+                                        <tr className="text-center fw-bold" style={{verticalAlign: 'middle'}}>
+                                            <td rowSpan={2}>Tanggal</td>
+                                            <td rowSpan={2}>Masuk</td>
+                                            <td rowSpan={2}>Keluar</td>
+                                            <td colSpan={2}>Status</td>
+                                            <td rowSpan={2}>Keterangan</td>
+                                        </tr>
+                                        <tr className="text-center fw-bold">
+                                            <td>Masuk</td>
+                                            <td>Keluar</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {presences.length > 0 ? presences.map((item, idx) => {
+                                            return (
+                                                <tr className="text-center" key={idx} style={{verticalAlign: 'middle'}}>
+                                                    <td className={`bg-${item.color}`}>{item.day}</td>
+                                                    <td className={`bg-${item.color}`}>{item.in}</td>
+                                                    <td className={`bg-${item.color}`}>{item.out}</td>
+                                                    <td className={`bg-${item.color}`}>{item.statusIn}</td>
+                                                    <td className={`bg-${item.color}`}>{item.statusOut}</td>
+                                                    <td className={`bg-${item.color}`}>{item.description}</td>
+                                                </tr>
+                                            )
+                                        }) : (
+                                            <tr className="text-center">
+                                                <td colSpan={6}><span className="text-muted">Tidak ada data</span></td>
                                             </tr>
-                                            <tr>
-                                                <th>Hari Libur</th>
-                                                <td>{holidayCount} Hari</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </Col>
-                                    <Col className="col-md-12 mt-5">
-                                        <Row>
-                                            <Col className="col-md-4 p-2">
-                                                <Button size="md" className="btn-block " type="submit" color="success">
-                                                    <Icon name="printer" />
-                                                    <span>CETAK</span>
-                                                </Button>
-                                            </Col>
-                                            <Col className="col-md-4 p-2">
-                                                <Button size="md" className="btn-block" type="submit" color="danger">
-                                                    <Icon name="download" />
-                                                    <span>UNDUH</span>
-                                                </Button>
-                                            </Col>
-                                            <Col className="col-md-4 p-2">
-                                                <Button size="md" className="btn-block" type="submit" color="info" onClick={() => {
-                                                    console.log(presences)
-                                                }}>
-                                                    <Icon name="checkbox" />
-                                                    <span>AJUKAN</span>
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
+                                        )
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
                             </Col>
                         </Row>
-                        <table className="table table-bordered overflow-x-scroll">
-                            <thead>
-                            <tr className="text-center fw-bold" style={{verticalAlign: 'middle'}}>
-                                <td rowSpan={2}>Tanggal</td>
-                                <td rowSpan={2}>Masuk</td>
-                                <td rowSpan={2}>Keluar</td>
-                                <td colSpan={2}>Status</td>
-                                <td rowSpan={2}>Keterangan</td>
-                            </tr>
-                            <tr className="text-center fw-bold">
-                                <td>Masuk</td>
-                                <td>Keluar</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {presences.length > 0 ? presences.map((item, idx) => {
-                                return (
-                                    <tr className="text-center" key={idx}>
-                                        <td className={`bg-${item.color}`}>{item.day}</td>
-                                        <td className={`bg-${item.color}`}>{item.in}</td>
-                                        <td className={`bg-${item.color}`}>{item.out}</td>
-                                        <td className={`bg-${item.color}`}>{item.statusIn}</td>
-                                        <td className={`bg-${item.color}`}>{item.statusOut}</td>
-                                        <td className={`bg-${item.color}`}>{item.description}</td>
+                        <Row>
+                            <Col md={12}>
+                                <table className="table table-bordered table-sm w-100">
+                                    <tbody>
+                                    <tr className="text-center">
+                                        <th>Hari Efektif</th>
+                                        <th>Hari Libur</th>
                                     </tr>
-                                )
-                            }) : (
-                                <tr className="text-center">
-                                    <td colSpan={6}><span className="text-muted">Tidak ada data</span></td>
-                                </tr>
-                            )
-                            }
-                            </tbody>
-                        </table>
+                                    <tr className="text-center">
+                                        <td>{activeCount} Hari</td>
+                                        <td>{holidayCount} Hari</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </Col>
+                        </Row>
+                        {presences.length > 0 && (
+                            <Row>
+                                <Col className="col-md-12 mt-2">
+                                    <Row>
+                                        <Col className="col-md-4 p-1">
+                                            <Button size="md" className="btn-block " type="submit" color="warning" disabled>
+                                                <Icon name="printer" />
+                                                <span>Cetak</span>
+                                            </Button>
+                                        </Col>
+                                        <Col className="col-md-4 p-1">
+                                            <Button size="md" className="btn-block" type="submit" color="info">
+                                                <Icon name="download" />
+                                                <span>Unduh</span>
+                                            </Button>
+                                        </Col>
+                                        <Col className="col-md-4 p-1">
+                                            <Button size="md" className="btn-block" type="submit" color="success" onClick={() => {
+                                                console.log(presences)
+                                            }}>
+                                                <Icon name="checkbox" />
+                                                <span>Ajukan</span>
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        )}
                     </PreviewCard>
                 </Block>
             </Content>

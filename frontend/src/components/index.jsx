@@ -8,6 +8,8 @@ import {PreviewCard, PreviewTable, PreviewAltCard, CodeBlock} from "./preview";
 import DataTablePagination from "./pagination";
 import RSelect from "./select";
 import RToast from "./toast";
+import Table from "./table";
+import Tooltips from "./tooltip";
 
 export {
     Block,
@@ -31,5 +33,7 @@ export {
     RSelect,
     Row,
     RToast,
+    Table,
+    Tooltips,
     UserAvatar,
 }

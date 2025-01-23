@@ -10,7 +10,7 @@ import {
     BlockTitle,
     Button,
     Icon,
-    PreviewCard, RToast
+    PreviewCard, RToast, Tooltips
 } from "../../components";
 import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
@@ -48,8 +48,16 @@ const Permission = () => {
             selector: (row) => row.accept,
             sortable: false,
             cell: (row) => {
-                return row.accept === '1' ? <Badge pill color="success">Disetujui</Badge> : <Badge pill color="warning">Pengajuan</Badge>;
-            },
+                switch(row.accept) {
+                    case "1":
+                        return <Badge pill color="outline-success" ><Icon name="check-thick"/><span>Disetujui</span></Badge>;
+                    case "2":
+                        return <Badge pill color="outline-warning" ><Icon name="clock"/><span>Diajukan</span></Badge>
+                    case "3":
+                        return <Badge pill color="outline-danger" ><Icon name="cross"/> <span>Ditolak</span></Badge>
+                    default:
+                }
+            }
         },
         {
             name: "Aksi",
@@ -77,7 +85,6 @@ const Permission = () => {
             )
         },
     ];
-
     useEffect(() => {
         loadData && getPermission().then(resp => {
             setPermissions(resp.data.result);
