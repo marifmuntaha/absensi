@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import Head from "../../layout/head";
 import {
     Block,
@@ -16,10 +16,13 @@ import {get as getHoliday} from "../../utils/api/holiday";
 import moment from "moment";
 import {Spinner} from "reactstrap";
 import {APICore} from "../../utils/api/APICore";
+import ButtonAction from "./partials/Button";
+import year from "../master/year";
 
 const Recapitulation = () => {
     const api = new APICore();
     const user = api.getLoggedInUser();
+    const tableRef = useRef(null);
     const {formState: {errors}, control, handleSubmit, setValue, getValues, watch} = useForm();
     const [loading, setLoading] = useState(false);
     const [optionTeachers, setOptionTeachers] = useState([]);
@@ -54,7 +57,7 @@ const Recapitulation = () => {
         {value: '2028', label: '2028'},
         {value: '2029', label: '2029'},
     ];
-    const onSubmit = async () => {
+    const onSubmit = () => {
         setLoading(true);
         const date = new Date(parseInt(getValues('year')), getValues('month') - 1, 1);
         const lastDate = moment(`${getValues('year')}-${getValues('month')}`, 'YYYY-M').endOf('months').date().toString();
@@ -65,7 +68,7 @@ const Recapitulation = () => {
             result.push(date.getDate().toString());
             date.setDate(date.getDate() + 1)
         }
-        await getHoliday({month: getValues('month'), year: getValues('year')}).then(resp => {
+        getHoliday({month: getValues('month'), year: getValues('year')}).then((resp) => {
             const holiday = resp.data.result;
             holiday.map((item) => {
                 return holidays.push(moment(item.date).format('D').toString())
@@ -74,37 +77,37 @@ const Recapitulation = () => {
             setActiveCount(lastDate ? parseInt(lastDate) - holidays?.length : 0)
             getPresence({teacherId: teacher?.id, month: getValues('month'), year: getValues('year')}).then(resp => {
                 setLoading(false);
-                const presences = resp.data.result
                 setPresentCount(() => {
-                    return presences.filter((item) => {
+                    return resp.data.result.filter((item) => {
                         return item.statusIn === 'H'
                     }).length
                 })
                 setPermissionCount(() => {
-                    return presences.filter((item) => {
+                    return resp.data.result.filter((item) => {
                         return item.statusIn === 'I'
                     }).length
                 })
                 setSickCount(() => {
-                    return presences.filter((item) => {
+                    return resp.data.result.filter((item) => {
                         return item.statusIn === 'S'
                     }).length
                 })
                 setAbsenceCount(() => {
-                    return presences.filter((item) => {
+                    return resp.data.result.filter((item) => {
                         return item.statusIn === 'A'
                     }).length
                 })
                 setPresences(result.map((date) => {
-                    const presences = resp.data.result?.filter((presence) => {
+                    const presences = resp.data.result.filter((presence) => {
                         return moment(presence.date, 'YYYY-MM-DD').format('D').toString() === date;
-                    }).pop();
-                    if (presences && !holidays.includes(date)){
-                        return {id: presences?.id, day: date, in: presences?.in, out: presences?.out, statusIn: presences.statusIn, statusOut: presences.statusOut, description: presences.description, color: 'white'};
+                    });
+                    if (presences?.length > 0 && !holidays.includes(date)) {
+                        const presence = presences.pop()
+                        return {id: presence.id, day: date, in: presence.in, out: presence?.out, statusIn: presence.statusIn, statusOut: presence.statusOut, description: presence.description, color: 'white'};
                     }
                     else {
                         const description = holiday.filter((item) => {
-                            return item.date === presences.date
+                            return moment(item.date).format('D').toString() === date
                         }).pop()
                         return {id: null, day: date, in: null, out: null, statusIn: null, statusOut: null, description: description?.name, color: 'light'};
                     }
@@ -118,7 +121,9 @@ const Recapitulation = () => {
             setLoading(false)
         });
     }
-
+    const handleParams = useCallback(() => {
+        return {teacherId: teacher?.id, month: getValues('month'), year: getValues('year')}
+    }, [teacher, getValues])
     useEffect(() => {
         getTeacher().then(resp => {
             setTeachers(resp.data.result)
@@ -292,7 +297,7 @@ const Recapitulation = () => {
                         <Row className="mb-2">
                             <Col md={12} sm={12}>
                                 <div className="overflow-auto">
-                                    <table className="table table-bordered">
+                                    <table className="table table-bordered" ref={tableRef}>
                                         <thead>
                                         <tr className="text-center fw-bold" style={{verticalAlign: 'middle'}}>
                                             <td rowSpan={2}>Tanggal</td>
@@ -331,7 +336,7 @@ const Recapitulation = () => {
                         </Row>
                         <Row>
                             <Col md={12}>
-                                <table className="table table-bordered table-sm w-100">
+                                <table className="table table-bordered w-100">
                                     <tbody>
                                     <tr className="text-center">
                                         <th>Hari Efektif</th>
@@ -345,33 +350,18 @@ const Recapitulation = () => {
                                 </table>
                             </Col>
                         </Row>
-                        {presences.length > 0 && (
-                            <Row>
-                                <Col className="col-md-12 mt-2">
-                                    <Row>
-                                        <Col className="col-md-4 p-1">
-                                            <Button size="md" className="btn-block " type="submit" color="warning" disabled>
-                                                <Icon name="printer" />
-                                                <span>Cetak</span>
-                                            </Button>
-                                        </Col>
-                                        <Col className="col-md-4 p-1">
-                                            <Button size="md" className="btn-block" type="submit" color="info">
-                                                <Icon name="download" />
-                                                <span>Unduh</span>
-                                            </Button>
-                                        </Col>
-                                        <Col className="col-md-4 p-1">
-                                            <Button size="md" className="btn-block" type="submit" color="success" onClick={() => {
-                                                console.log(presences)
-                                            }}>
-                                                <Icon name="checkbox" />
-                                                <span>Ajukan</span>
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            </Row>
+                        {user.role === '3' && presences.length > 0 && (
+                            <ButtonAction
+                                params={handleParams()}
+                                presences={presences}
+                                present={presentCount}
+                                permission={permissionCount}
+                                sick={sickCount}
+                                absence={absenceCount}
+                                active={activeCount}
+                                holiday={holidayCount}
+                                tableRef={tableRef}
+                            />
                         )}
                     </PreviewCard>
                 </Block>

@@ -11,10 +11,12 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
 const AuthController = () => import('#controllers/auth_controller')
+const DocumentController = () => import('#controllers/documents_controller')
 const HolidayController = () => import('#controllers/holidays_controller')
 const NotificationController = () => import('#controllers/notifications_controller')
 const PermissionController = () => import('#controllers/permissions_controller')
 const PresenceController = () => import('#controllers/presences_controller')
+const ReportController = () => import('#controllers/reports_controller')
 const SchoolController = () => import('#controllers/schools_controller')
 const SemesterController = () => import('#controllers/semesters_controller')
 const TeacherController = () => import('#controllers/teachers_controller')
@@ -37,9 +39,8 @@ router
         router.post('logout', [AuthController, 'logout'])
       })
       .prefix('auth')
-    router.get('test', async () => {
-      return 'test'
-    })
+    router.post('generate/pdf', [DocumentController, 'pdf'])
+    router.get('generate/cert', [DocumentController, 'cert'])
     router
       .group(() => {
         router
@@ -54,6 +55,7 @@ router
         router.resource('notification', NotificationController).only(['index', 'update'])
         router.resource('permission', PermissionController).apiOnly()
         router.resource('presence', PresenceController).apiOnly()
+        router.resource('report', ReportController).apiOnly()
         router.resource('teacher', TeacherController).apiOnly()
         router.resource('token', TokenController).only(['index'])
         router.resource('user', UserController).apiOnly()
