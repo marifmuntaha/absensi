@@ -41,6 +41,7 @@ router
       .prefix('auth')
     router.post('generate/pdf', [DocumentController, 'pdf'])
     router.get('generate/cert', [DocumentController, 'cert'])
+    router.get('generate/test', [DocumentController, 'test'])
     router
       .group(() => {
         router
