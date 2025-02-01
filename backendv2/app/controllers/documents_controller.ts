@@ -9,6 +9,9 @@ import Teacher from '#models/teacher'
 import moment from 'moment'
 import 'moment/locale/id.js'
 import selfsigned from 'selfsigned'
+import signpdf from '@signpdf/signpdf'
+import { P12Signer } from '@signpdf/signer-p12'
+import { plainAddPlaceholder } from '@signpdf/placeholder-plain'
 
 export default class DocumentsController {
   async pdf({ request }: HttpContext) {
@@ -19,6 +22,7 @@ export default class DocumentsController {
     const width = 612
     const logo = await drive.use('fs').getStream('/images/logo.png')
     const signature = await drive.use('fs').getStream('/images/logo.png')
+
     const pdf = new PDFDocument({
       pdfVersion: '1.4',
       size: 'FOLIO',
@@ -184,27 +188,55 @@ export default class DocumentsController {
     selfsigned.generate(
       attr,
       {
-        keySize: 2048, // the size for the private key in bits (default: 1024)
-        days: 365, // how long till expiry of the signed certificate (default: 365)
-        notBeforeDate: new Date(), // The date before which the certificate should not be valid (default: now)
-        algorithm: 'sha256', // sign the certificate with specified algorithm (default: 'sha1')
-        extensions: [{ name: 'basicConstraints', cA: true }], // certificate extensions array
-        pkcs7: true, // include PKCS#7 as part of the output (default: false)
-        clientCertificate: true, // generate client cert signed by the original key (default: false)
-        clientCertificateCN: 'jdoe', // client certificate's common name (default: 'John Doe jdoe123')
+        days: 365,
       },
       (_err, data) => {
-        // fs.writeFile(app.makePath('/storage/cert/52/private.pem', data.private), (err) => {
-        //   console.error(err)
-        // })
-        // fs.writeFile(app.makePath('/storage/cert/52/public.pem', data.public), (err) => {
-        //   console.error(err)
-        // })
-        // fs.writeFile(app.makePath('/storage/cert/52/cert.cert', data.cert), (err) => {
-        //   console.error(err)
-        // })
-        console.log(data.private)
+        fs.writeFile(
+          app.makePath('storage/cert/52/private.pem'),
+          data?.private.toString(),
+          (err) => {
+            console.error('error', err)
+          }
+        )
+        fs.writeFile(app.makePath('storage/cert/52/public.pem'), data?.public.toString(), (err) => {
+          console.error('error', err)
+        })
+        fs.writeFile(app.makePath('storage/cert/52/cert.pem'), data?.cert.toString(), (err) => {
+          console.error('error', err)
+        })
       }
     )
+    const document = await drive.use('fs').get('document/1.pdf')
+    const certificate = await drive.use('fs').get('cert/52/cert.pem')
+    const signer = new P12Signer(Buffer.from(certificate))
+    const signedPdf = new signpdf.SignPdf()
+    await signedPdf.sign(Buffer.from(document), signer)
+    console.log(signedPdf)
+  }
+
+  async test() {
+    const pdfBuffer = fs.readFileSync(app.makePath('storage/document/1-1-2025.pdf'))
+    // certificate.p12 is the certificate that is going to be used to sign
+    const certificateBuffer = fs.readFileSync(app.makePath('storage/cert/52/cert.pem'))
+    const signer = new P12Signer(certificateBuffer)
+
+    // The PDF needs to have a placeholder for a signature to be signed.
+    const pdfWithPlaceholder = plainAddPlaceholder({
+      pdfBuffer,
+      reason: 'The user is decalaring consent.',
+      contactInfo: 'signpdf@example.com',
+      name: 'John Doe',
+      location: 'Free Text Str., Free World',
+    })
+
+    // pdfWithPlaceholder is now a modified buffer that is ready to be signed.
+
+    const signedPdf = new signpdf.SignPdf()
+    await signedPdf.sign(pdfWithPlaceholder, signer)
+
+    // signedPdf is a Buffer of an electronically signed PDF. Store it.
+    // const targetPath = `${__dirname}/../output/typescript.pdf`
+    // fs.writeFileSync(targetPath, signedPdf)
+    // console.log(pdfBuffer)
   }
 }

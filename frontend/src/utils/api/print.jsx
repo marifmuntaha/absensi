@@ -8,7 +8,7 @@ function get(params) {
 }
 
 function print(params: { id: string, teacherId: string, value: string, month: string, year: string }) {
-    const baseUrl = '/generate'
+    const baseUrl = '/generate/pdf'
     return api.create(baseUrl, params)
 }
 
