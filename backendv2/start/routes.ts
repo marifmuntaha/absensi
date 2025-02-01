@@ -26,9 +26,7 @@ const WorkController = () => import('#controllers/works_controller')
 const YearController = () => import('#controllers/years_controller')
 
 router.get('/', async () => {
-  return {
-    hello: 'API SISTEM ABSENSI ONLINE',
-  }
+  return 'API SISTEM ABSENSI ONLINE'
 })
 
 router
@@ -40,8 +38,6 @@ router
       })
       .prefix('auth')
     router.post('generate/pdf', [DocumentController, 'pdf'])
-    router.get('generate/cert', [DocumentController, 'cert'])
-    router.get('generate/test', [DocumentController, 'test'])
     router
       .group(() => {
         router

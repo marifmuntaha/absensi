@@ -35,7 +35,6 @@ export default class ReportsController {
         result: createReport,
       })
     } catch (error) {
-      console.log(error)
       return response.status(400).json({
         message: error.messages ? error.messages[0].message : error,
       })
@@ -60,9 +59,9 @@ export default class ReportsController {
       const data = request.all()
       const payload = await updateReportValidator.validate(data)
       const report = await Report.findOrFail(payload.id)
-      const updateRaport = await report.fill(payload).save()
+      const updateReport = await report.fill(payload).save()
       return response.status(200).json({
-        result: updateRaport,
+        result: updateReport,
       })
     } catch (error) {
       return response.status(400).json({

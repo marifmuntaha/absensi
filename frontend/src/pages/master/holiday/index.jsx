@@ -95,7 +95,7 @@ const Holiday = () => {
                         const params = {
                             semester_id: semester.id,
                             name: item.holiday_name,
-                            date: moment(item.holiday_date, 'YYYY-M-D').format('YYYY-MM-DD HH:mm:ss'),
+                            date: moment(item.holiday_date, 'YYYY-M-D').format('YYYY-MM-DD'),
                             description: ''
                         }
                         item++;

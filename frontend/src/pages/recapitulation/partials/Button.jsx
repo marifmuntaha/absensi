@@ -42,13 +42,13 @@ const ButtonAction = ({...props}) => {
                     holiday: props?.holiday,
                 })
             }
-            storeReport(params).then(resp => {
-                console.log(resp)
-                setLoading(false);
+            storeReport(params).then(() => {
+                setLoading('2');
                 setLoadData(true);
-            }).then(err => {
+                RToast('Validasi absensi berhasil, silahkan menunggu disetujui', 'success')
+            }).catch(err => {
                 RToast(err, 'error');
-                setLoading(false);
+                setLoading('3');
             })
         }
         else if (state === '1') {

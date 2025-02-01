@@ -4,6 +4,7 @@ import { storePermissionValidator, updatePermissionValidator } from '#validators
 import drive from '@adonisjs/drive/services/main'
 import { randomUUID } from 'node:crypto'
 import emitter from '@adonisjs/core/services/emitter'
+import User from "#models/user";
 
 export default class PermissionsController {
   async index({ request, response }: HttpContext) {
@@ -23,7 +24,7 @@ export default class PermissionsController {
     }
   }
 
-  async store({ request, response }: HttpContext) {
+  async store({ auth, request, response }: HttpContext) {
     try {
       const data = request.all()
       const file = request.file('image')
@@ -34,7 +35,17 @@ export default class PermissionsController {
         payload.letter = await drive.use().getUrl(key)
       }
       const createPermission = await Permission.create(payload)
-      await emitter.emit('permission:store', createPermission)
+      const administrator = await User.query().where('role', '1').first()
+      const createNotify = {
+        fromUser: auth.user?.id,
+        toUser: administrator?.id,
+        type: '1',
+        status: '2',
+        message: `Pengajuan Ijin ${auth.user?.name}`,
+        read: '2',
+      }
+      // @ts-ignore
+      await emitter.emit('permission:store', createNotify)
       return response.status(201).json({
         message: 'Data Perijinan berhasil diajukan.',
         result: createPermission,

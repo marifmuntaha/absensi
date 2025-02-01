@@ -1,25 +1,33 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Presence from '#models/presence'
-import moment from 'moment/moment.js'
+import Teacher from '#models/teacher'
+import { DateTime, Interval } from 'luxon'
 
 export default class extends BaseSeeder {
   async run() {
-    const startDate = moment('2025-01-01')
-    const endDate = moment('2025-02-1')
+    // @ts-ignore
     let query = []
-    while (startDate.isBefore(endDate)) {
-      query.push({
-        teacherId: 2,
-        date: startDate.format('YYYY-MM-DD'),
-        in: '07:00:00',
-        out: '13:30:00',
-        statusIn: 'H',
-        statusOut: 'H',
-        description: '',
-        letter: '',
+    const teachers = await Teacher.all()
+    const interval = Interval.fromDateTimes(
+      DateTime.now().startOf('month'),
+      DateTime.now().endOf('month')
+    )
+    const date = interval.splitBy({ day: 1 })
+    teachers.map((teacher) => {
+      date.map((d) => {
+        query.push({
+          teacherId: teacher.id,
+          date: d.start,
+          in: '07:00:00',
+          out: '13:30:00',
+          statusIn: 'H',
+          statusOut: 'H',
+          description: '',
+          letter: '',
+        })
       })
-      startDate.add(1, 'days')
-    }
+    })
+
     // @ts-ignore
     await Presence.createMany(query)
   }
