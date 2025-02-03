@@ -3,7 +3,7 @@ import QrScanner from "qr-scanner";
 import moment from "moment/moment";
 import {BlockContent, BlockDes, BlockHead, BlockTitle, PreviewCard, RToast} from "../../../components";
 import {get as getWorks} from "../../../utils/api/work";
-import {get as getPresence, update as updatePresence} from "../../../utils/api/presence";
+import {get as getPresence, store as storePresence, update as updatePresence} from "../../../utils/api/presence";
 import {Alert} from "reactstrap";
 
 const OperatorScan = () => {
@@ -24,43 +24,66 @@ const OperatorScan = () => {
             const endTimeIn = mutationTime(timeInDay.in, 2);
             const startTimeEnd = mutationTime(timeInDay.out, -1);
             const endTimeEnd = mutationTime(timeInDay.out, 3);
-            if (moment().toDate() < startTimeIn.toDate()){
+            if (moment().toDate() < startTimeIn.toDate()) {
                 RToast('Absensi masuk belum dimulai.', 'error');
             } else {
-                if (startTimeIn.toDate() > moment().toDate() && moment().toDate() < endTimeIn.toDate()){
+                if (startTimeIn.toDate() < moment().toDate() && moment().toDate() < endTimeIn.toDate()) {
                     getPresence({date: moment().format("YYYY-MM-DD"), teacher_id: teacher.id}).then(resp => {
                         const presence = resp?.data?.result?.pop();
-                        presence.date = moment(presence.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
-                        presence.statusIn = 'H'
-                        presence.in = moment().format('HH:mm:ss');
-                        updatePresence(presence).then(() => {
-                            RToast('Presensi Masuk berhasil disimpan.', 'success')
-                        }).catch(err => {
-                            RToast(err, 'error');
-                        });
+                        if (presence === undefined) {
+                            const params = {
+                                teacher_id: teacher.id,
+                                date: moment().format("YYYY-MM-DD"),
+                                in: moment().format("HH:mm:ss").toString(),
+                                out: moment().format("HH:mm:ss").toString(),
+                                status_in: 'H',
+                                status_out: '',
+                                description: '',
+                                letter: ''
+                            }
+                            storePresence(params).then(() => {
+                                RToast('Absensi masuk berhasil disimpan.', 'success');
+                            }).catch(err => {
+                                RToast('Absensi masuk gagal disimpan. ' + err, 'error');
+                            })
+                        } else {
+                            presence.date = moment(presence.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                            presence.statusIn = 'H'
+                            presence.in = moment().format('HH:mm:ss');
+                            updatePresence(presence).then(() => {
+                                RToast('Presensi Masuk berhasil disimpan.', 'success')
+                            }).catch(err => {
+                                RToast(err, 'error');
+                            });
+                        }
                     }).catch(err => {
                         RToast(err, 'error');
                     });
-                }
-                else if (endTimeIn.toDate() < moment().toDate() && moment().toDate() < startTimeEnd.toDate()) {
+                } else if (endTimeIn.toDate() < moment().toDate() && moment().toDate() < startTimeEnd.toDate()) {
                     RToast('Absensi pulang belum dimulai.', 'error');
-                }
-                else if (startTimeEnd.toDate() < moment().toDate() && moment().toDate() < endTimeEnd.toDate()){
+                } else if (startTimeEnd.toDate() < moment().toDate() && moment().toDate() < endTimeEnd.toDate()) {
                     getPresence({date: moment().format("YYYY-MM-DD"), teacher_id: teacher.id}).then(resp => {
                         const presence = resp?.data?.result?.pop();
-                        presence.date = moment(presence.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
-                        presence.statusOut = 'H'
-                        presence.Out = moment().format('HH:mm:ss');
-                        updatePresence(presence).then(() => {
-                            RToast('Presensi Pulang berhasil disimpan.', 'success')
-                        }).catch(err => {
-                            RToast(err, 'error')
-                        });
+                        if (presence === undefined) {
+                            RToast('Ada belum melakukan absensi masuk.', 'error');
+                        } else {
+                            if (presence.statusOut === 'H') {
+                                RToast('anda sudah melakukan absensi Pulang.', 'error')
+                            } else {
+                                presence.date = moment(presence.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                                presence.statusOut = 'H'
+                                presence.out = moment().format('HH:mm:ss').toString();
+                                updatePresence(presence).then(() => {
+                                    RToast('Presensi Pulang berhasil disimpan.', 'success')
+                                }).catch(err => {
+                                    RToast(err, 'error')
+                                });
+                            }
+                        }
                     }).catch(err => {
                         RToast(err, 'error');
                     });
-                }
-                else {
+                } else {
                     RToast('Absensi telah selesai hari ini.', 'error');
                 }
             }
@@ -73,7 +96,7 @@ const OperatorScan = () => {
         console.log(err);
     };
     const mutationTime = (time, value) => {
-        return moment(time, 'HH : mm : ss').add(value, 'hours');
+        return moment(time, 'HH:mm:ss').add(value, 'hours');
     }
     useEffect(() => {
         if (videoEl?.current && !scanner.current) {

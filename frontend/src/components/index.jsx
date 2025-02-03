@@ -10,8 +10,10 @@ import RSelect from "./select";
 import RToast from "./toast";
 import Table from "./table";
 import Tooltips from "./tooltip";
+import {BarChart, DoughnutChart} from "./chart";
 
 export {
+    BarChart,
     Block,
     BlockHead,
     BlockHeadContent,
@@ -23,6 +25,7 @@ export {
     BackTo,
     CodeBlock,
     Col,
+    DoughnutChart,
     Icon,
     LinkList,
     LinkItem,

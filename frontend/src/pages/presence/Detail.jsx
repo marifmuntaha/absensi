@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import Head from "../../layout/head";
 import {
@@ -20,7 +20,7 @@ import {get as getHoliday} from "../../utils/api/holiday";
 import {get as getTeacher} from "../../utils/api/teacher";
 
 const Detail = () => {
-    const yearActive = useYear();
+    const [yearActive] = useYear();
     const semester = useSemester();
     const {month, year} = useParams();
     const [days, setDays] = useState([]);
@@ -64,7 +64,7 @@ const Detail = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
-        <React.Fragment>
+        <Suspense fallback={<div>Loading...</div>}>
             <Head title="Kelola Absesnsi" />
             <Content>
                 <Block size="sm">
@@ -198,7 +198,7 @@ const Detail = () => {
                     </PreviewAltCard>
                 </Block>
             </Content>
-        </React.Fragment>
+        </Suspense>
     )
 }
 

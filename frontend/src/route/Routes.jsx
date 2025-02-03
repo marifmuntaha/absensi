@@ -1,6 +1,6 @@
 import React from "react";
 
-const AdministratorDashboard = React.lazy(() => import('../pages/dashboard'));
+const Dashboard = React.lazy(() => import('../pages/dashboard'));
 const School = React.lazy(() => import('../pages/master/school'));
 const Year = React.lazy(() => import('../pages/master/year'));
 const Semester = React.lazy(() => import('../pages/master/semester'));
@@ -26,8 +26,7 @@ const Error504 = React.lazy(() => import('../pages/error/Error504'));
 const Scan = React.lazy(() => import('../pages/scan'));
 
 const administratorRoute = [
-    {path: '/', name: 'Dashboard', component: <AdministratorDashboard/>},
-    {path: '/administrator', name: 'Dashboard', element: <AdministratorDashboard />},
+    {path: '/', name: 'Dashboard', element: <Dashboard />},
     {path: '/master/data-sekolah', name: 'Dashboard', element: <School />},
     {path: '/master/data-tapel', name: 'Data Tahun Pelajaran', element: <Year />},
     {path: '/master/data-semester', name: 'Data Semester', element: <Semester />},

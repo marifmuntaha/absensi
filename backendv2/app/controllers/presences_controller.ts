@@ -44,7 +44,7 @@ export default class PresencesController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: error.message,
+        message: error.messages ? error.messages[0].message : error.message,
       })
     }
   }

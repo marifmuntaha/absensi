@@ -4,7 +4,7 @@ import { storePermissionValidator, updatePermissionValidator } from '#validators
 import drive from '@adonisjs/drive/services/main'
 import { randomUUID } from 'node:crypto'
 import emitter from '@adonisjs/core/services/emitter'
-import User from "#models/user";
+import User from '#models/user'
 
 export default class PermissionsController {
   async index({ request, response }: HttpContext) {

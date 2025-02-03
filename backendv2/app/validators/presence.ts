@@ -16,7 +16,7 @@ export const storePresenceValidator = vine.compile(
       formats: 'HH:mm:ss',
     }),
     status_in: vine.string(),
-    status_out: vine.string(),
+    status_out: vine.string().optional(),
     description: vine.string().optional(),
     letter: vine.string().optional(),
   })
