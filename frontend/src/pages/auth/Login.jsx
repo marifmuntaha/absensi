@@ -57,18 +57,7 @@ const Login = () => {
     };
     useEffect(() => {
         if (redirect && api.isUserAuthenticated()) {
-            const user = api.getLoggedInUser();
-            // noinspection JSUnresolvedReference
-            switch (user.role) {
-                case "1":
-                    return navigate('/administrator');
-                case "2":
-                    return navigate('/kepala-madrasah');
-                case "3":
-                    return navigate('/guru');
-                default:
-                    return navigate('/');
-            }
+            return navigate('/');
         }
         setRedirect(false);
         /* eslint-disable react-hooks/exhaustive-deps */

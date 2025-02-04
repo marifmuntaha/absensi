@@ -6,18 +6,18 @@ const Year = React.lazy(() => import('../pages/master/year'));
 const Semester = React.lazy(() => import('../pages/master/semester'));
 const Holiday = React.lazy(() => import('../pages/master/holiday'));
 const Work = React.lazy(() => import('../pages/master/work'));
-const AdministratorTeacher = React.lazy(() => import('../pages/teacher'));
+const Teacher = React.lazy(() => import('../pages/teacher'));
 const TeacherView = React.lazy(() => import('../pages/teacher/view'));
 const AdministratorUser = React.lazy(() => import('../pages/user'));
 const AdministratorPresence = React.lazy(() => import('../pages/presence'));
 const PresenceDetail = React.lazy(() => import('../pages/presence/Detail'));
 const Recapitulation = React.lazy(() => import('../pages/recapitulation'));
 
-const HeadDashboard = React.lazy(() => import('../pages/dashboard'));
+
 const TeacherDashboard = React.lazy(() => import('../pages/dashboard'));
 const EditTeacher = React.lazy(() => import('../pages/teacher/Edit'));
 const EditUser = React.lazy(() => import('../pages/user/Edit'));
-const Permission = React.lazy(() => import('../pages/presence/Permission'));
+const Permission = React.lazy(() => import('../pages/permission'));
 
 const Login = React.lazy(() => import('../pages/auth/Login'));
 const Logout = React.lazy(() => import('../pages/auth/Logout'));
@@ -32,7 +32,7 @@ const administratorRoute = [
     {path: '/master/data-semester', name: 'Data Semester', element: <Semester />},
     {path: '/master/data-hari-libur', name: 'Data Hari Libur', element: <Holiday />},
     {path: '/master/data-jam-kerja', name: 'Data Jam Kerja', element: <Work />},
-    {path: '/data-guru', name: 'Data Guru/Karyawan', element: <AdministratorTeacher />},
+    {path: '/data-guru', name: 'Data Guru/Karyawan', element: <Teacher />},
     {path: '/data-guru/:id/detail', name: 'Data Guru/Karyawan', element: <TeacherView />},
     {path: '/absensi/kelola', name: 'Data Absensi', element: <AdministratorPresence />},
     {path: '/absensi/kelola/:month/:year', name: 'Data Absensi', element: <PresenceDetail />},
@@ -41,7 +41,9 @@ const administratorRoute = [
 ]
 
 const headRoute = [
-    {path: '/kepala-madrasah', name: 'Dashboard', element: <HeadDashboard />},
+    {path: '/', name: 'Dashboard', element: <Dashboard />},
+    {path: '/kepala/data-guru', name: 'Data Guru', element: <Teacher />},
+    {path: '/kepala/ajuan/ijin', name: 'Ajuan Ijin', element: <Permission />},
 ]
 
 const teacherRoute = [

@@ -5,6 +5,7 @@ import drive from '@adonisjs/drive/services/main'
 import { randomUUID } from 'node:crypto'
 import emitter from '@adonisjs/core/services/emitter'
 import User from '#models/user'
+import moment from 'moment'
 
 export default class PermissionsController {
   async index({ request, response }: HttpContext) {
@@ -12,6 +13,13 @@ export default class PermissionsController {
       const permission = Permission.query()
       if (request.input('teacherId')) {
         permission.where('teacherId', request.input('teacherId'))
+      }
+      if (request.input('month') && request.input('year')) {
+        const { month, year } = request.all()
+        const date = moment(`${month}-${year}`, 'M-YYYY')
+        const startDate = date.startOf('month').format('YYYY-MM-DD')
+        const endDate = date.endOf('month').format('YYYY-MM-DD')
+        permission.where('date', '>=', startDate).andWhere('date', '<=', endDate)
       }
       const permissions = await permission.orderBy('date', 'desc')
       return response.status(200).json({
@@ -35,7 +43,7 @@ export default class PermissionsController {
         payload.letter = await drive.use().getUrl(key)
       }
       const createPermission = await Permission.create(payload)
-      const administrator = await User.query().where('role', '1').first()
+      const administrator = await User.query().where('role', '2').first()
       const createNotify = {
         fromUser: auth.user?.id,
         toUser: administrator?.id,

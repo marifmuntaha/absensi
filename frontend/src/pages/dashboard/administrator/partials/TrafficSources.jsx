@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Card } from "reactstrap";
-import {Icon, DoughnutChart} from "../../../components";
+import {Icon, DoughnutChart} from "../../../../components";
+import {get as getPresence} from "../../../../utils/api/presence"
+import moment from "moment";
 
-const TrafficSources = () => {
-    const trafficSources = {
+const TrafficSources = ({...props}) => {
+    const [presence, setPresence] = useState([]);
+    const [permission, setPermission] = useState([]);
+    const [sick, setSick] = useState([]);
+    const [absent, setAbsent] = useState([]);
+    const [dataDoughnut, setDataDoughnut] = useState({
         labels: ["Hadir", "Ijin", "Sakit", "Tanpa Keterangan"],
         dataUnit: "People",
         legend: false,
@@ -11,11 +17,43 @@ const TrafficSources = () => {
             {
                 borderColor: "#fff",
                 backgroundColor: ["#72f894", "#698ff6", "#fbdc6f", "#fb5555"],
-                data: [4305, 859, 482, 138],
+                data: [0, 0, 0, 0],
             },
         ],
-    };
-    const [data, setData] = useState(trafficSources);
+    });
+
+    useEffect(() => {
+        getPresence({month: props.month, year: moment().format('YYYY').toString()}).then((resp) => {
+            setPresence(resp.data.result?.filter((item) => {
+                return item.statusIn === 'H'
+            }))
+            setPermission(resp.data.result?.filter((item) => {
+                return item.statusIn === 'I'
+            }))
+            setSick(resp.data.result?.filter((item) => {
+                return item.statusIn === 'S'
+            }))
+            setAbsent(resp.data.result?.filter((item) => {
+                return item.statusIn === 'A'
+            }))
+        })
+    }, [props.month])
+
+    useEffect(() => {
+        setDataDoughnut({
+            labels: ["Hadir", "Ijin", "Sakit", "Tanpa Keterangan"],
+            dataUnit: "People",
+            legend: false,
+            datasets: [
+                {
+                    borderColor: "#fff",
+                    backgroundColor: ["#72f894", "#698ff6", "#fbdc6f", "#fb5555"],
+                    data: [presence?.length, permission?.length, sick?.length, absent?.length],
+                },
+            ],
+        })
+    }, [presence, permission, sick, absent])
+
     return (
         <Card className="card-full overflow-hidden">
             <div className="nk-ecwg nk-ecwg4 h-100">
@@ -27,7 +65,7 @@ const TrafficSources = () => {
                     </div>
                     <div className="data-group">
                         <div className="nk-ecwg4-ck">
-                            <DoughnutChart data={data} />
+                            <DoughnutChart data={dataDoughnut} />
                         </div>
                         <ul className="nk-ecwg4-legends">
                             <li>
@@ -35,28 +73,28 @@ const TrafficSources = () => {
                                     <span className="dot dot-lg sq" style={{ background: "#72f894" }}></span>
                                     <span>Hadir</span>
                                 </div>
-                                <div className="amount amount-xs">{data === "7" ? "2505" : data === "15" ? "3505" : "4000"}</div>
+                                <div className="amount amount-xs">{presence?.length}</div>
                             </li>
                             <li>
                                 <div className="title">
                                     <span className="dot dot-lg sq" style={{ background: "#698ff6" }}></span>
                                     <span>Ijin</span>
                                 </div>
-                                <div className="amount amount-xs">{data === "7" ? "482" : data === "15" ? "800" : "1250"}</div>
+                                <div className="amount amount-xs">{permission?.length}</div>
                             </li>
                             <li>
                                 <div className="title">
                                     <span className="dot dot-lg sq" style={{ background: "#fbdc6f" }}></span>
                                     <span>Sakit</span>
                                 </div>
-                                <div className="amount amount-xs">{data === "7" ? "859" : data === "15" ? "1650" : "3250"}</div>
+                                <div className="amount amount-xs">{sick?.length}</div>
                             </li>
                             <li>
                                 <div className="title">
                                     <span className="dot dot-lg sq" style={{ background: "#fb5555" }}></span>
                                     <span>Tanpa Keterangan</span>
                                 </div>
-                                <div className="amount amount-xs">{data === "7" ? "138" : data === "15" ? "150" : "250"}</div>
+                                <div className="amount amount-xs">{absent?.length}</div>
                             </li>
                         </ul>
                     </div>

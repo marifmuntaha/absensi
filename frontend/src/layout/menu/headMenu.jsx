@@ -7,7 +7,22 @@ const headMenu = [
     {
         icon: "user-fill",
         text: "Data Guru",
-        link: "/data-guru",
+        link: "/kepala/data-guru",
+    },
+    {
+        icon: "check",
+        text: "Ajuan",
+        active: false,
+        subMenu: [
+            {
+                text: "Ajuan Ijin",
+                link: "/kepala/ajuan/ijin",
+            },
+            {
+                text: "Ajuan TTD",
+                link: "/kepala/absensi/rekapitulasi",
+            },
+        ],
     },
     {
         icon: "calendar",
@@ -16,18 +31,18 @@ const headMenu = [
         subMenu: [
             {
                 text: "Kelola Absensi",
-                link: "/absensi/kelola",
+                link: "/kepala/absensi/kelola",
             },
             {
                 text: "Rekapitulasi",
-                link: "/absensi/rekapitulasi",
+                link: "/kepala/absensi/rekapitulasi",
             },
         ],
     },
     {
         icon: "setting-alt",
         text: "Pengaturan",
-        link: "/pengaturan",
+        link: "/kepala/pengaturan",
     },
 ];
 export default headMenu;

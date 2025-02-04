@@ -10,16 +10,19 @@ import {
     BlockTitle,
     Button,
     Icon,
-    PreviewCard, RToast, Tooltips
+    PreviewCard, RToast
 } from "../../components";
 import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
-import Partials from "./Partials";
+import Partials from "../presence/Partials";
 import {get as getPermission,destroy as destroyPermission} from "../../utils/api/permission"
 import moment from "moment";
 import "moment/locale/id"
+import {APICore} from "../../utils/api/APICore";
 
 const Permission = () => {
+    const api = new APICore();
+    const user = api.getLoggedInUser();
     const [modal, setModal] = useState(false);
     const [permissions, setPermissions] = useState([]);
     const [permission, setPermission] = useState(null);
@@ -86,6 +89,7 @@ const Permission = () => {
         },
     ];
     useEffect(() => {
+
         loadData && getPermission().then(resp => {
             setPermissions(resp.data.result);
             setLoadData(false);
