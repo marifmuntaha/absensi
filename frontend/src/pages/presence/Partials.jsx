@@ -1,12 +1,15 @@
-    import React, {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Label, Modal, ModalBody, ModalHeader, Spinner} from "reactstrap";
 import {Col, Row, RSelect, RToast} from "../../components";
 import {Controller, useForm} from "react-hook-form";
 import {store as storePermission, update as updatePermission} from "../../utils/api/permission"
 import moment from "moment";
+    import {APICore} from "../../utils/api/APICore";
 
 
 const Partials = ({...props}) => {
+    const api = new APICore();
+    const user = api.getLoggedInUser();
     const teacher = JSON.parse(localStorage.getItem('teacher'))
     const {register, handleSubmit, setValue, formState: {errors}, getValues, reset, control} = useForm();
     const [loading, setLoading] = useState(false);
@@ -41,19 +44,22 @@ const Partials = ({...props}) => {
         setLoading(true);
         const params = {
             id: getValues('id'),
-            teacherId: teacher.id,
+            teacherId: getValues('teacherId'),
             date: moment().format('YYYY-MM-DD'),
             status: getValues('status'),
             description: getValues('description'),
-        }
-        if (file !== null) {
-            params.image = file
+            letter: getValues('letter'),
+            accept: getValues('accept')
         }
         await updatePermission(params).then(resp => {
             RToast(resp.data.message, 'success');
             toggle();
             props.setLoadData(true);
-        }).catch(err => RToast(err, 'error'));
+            setLoading(false);
+        }).catch(err => {
+            RToast(err, 'error');
+            setLoading(false);
+        });
     }
     const toggle = () => {
         reset();
@@ -155,9 +161,24 @@ const Partials = ({...props}) => {
                                 </div>
                             </Col>
                             <div className="form-group">
-                                <Button size="lg" className="btn-block" type="submit" color="primary">
-                                    {loading ? <Spinner size="sm" color="light"/> : "SIMPAN"}
-                                </Button>
+                                {user.role === '2' ? (
+                                    <Row className="between-center">
+                                        <Col size={6}>
+                                            <Button size="md" className="btn-block" type="submit" color="success" onClick={() => setValue('accept', '1')}>
+                                                {loading ? <Spinner size="sm" color="light"/> : "SETUJU"}
+                                            </Button>
+                                        </Col>
+                                        <Col size={6}>
+                                            <Button size="md" className="btn-block" type="submit" color="danger" onClick={() => setValue('accept', '3')}>
+                                                {loading ? <Spinner size="sm" color="light"/> : "TOLAK"}
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                ) : (
+                                    <Button size="md" className="btn-block" type="submit" color="primary">
+                                        {loading ? <Spinner size="sm" color="light"/> : "SIMPAN"}
+                                    </Button>
+                                    )}
                             </div>
                         </Row>
                     </form>

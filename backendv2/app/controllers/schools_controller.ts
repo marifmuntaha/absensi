@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import School from '#models/school'
 import { updateSchoolValidator } from '#validators/school'
-import drive from '@adonisjs/drive/services/main'
 
 export default class SchoolsController {
   async show({ params, response }: HttpContext) {
@@ -23,7 +22,7 @@ export default class SchoolsController {
       if (image) {
         const key = `images/logo.${image.extname}`
         await image.moveToDisk(key)
-        payload.logo = await drive.use().getUrl(key)
+        payload.logo = key
       }
       const school = await School.findOrFail(payload.id)
       const update = await school.fill(payload).save()

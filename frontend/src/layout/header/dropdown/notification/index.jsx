@@ -27,16 +27,17 @@ const Notification = () => {
     const api = new APICore();
     const user  = api.getLoggedInUser();
     const [notifications, setNotifications] = useState([]);
-    const onSubmit = async (params) => {
+    const [loadData, setLoadData] = useState(true)
+    const onSubmit = (params) => {
         params.read = '1';
-        await updateNotification(params);
+        updateNotification(params).then(() => setLoadData(true));
     }
     useEffect(() => {
-        getNotification({toUser: user.id, read: '2'}).then(resp => {
+        loadData && getNotification({toUser: user.id, read: '2'}).then(resp => {
             setNotifications(resp.data.result)
-        })
+        }).then(() => setLoadData(false))
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [loadData]);
 
     return (
         <UncontrolledDropdown className="user-dropdown">
@@ -51,7 +52,7 @@ const Notification = () => {
                     <a href="#markasread" onClick={(ev) => {
                         ev.preventDefault()
                         notifications.map(item => {
-                            return onSubmit(item).then((resp) => console.log(resp)).catch(err => console.log(err));
+                            return onSubmit(item);
                         })
                     }}>
                         Tandai dibaca semua

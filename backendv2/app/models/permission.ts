@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
+import { afterFetch, BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
 import Teacher from '#models/teacher'
 import type { HasOne } from '@adonisjs/lucid/types/relations'
+import env from '#start/env'
 
 export default class Permission extends BaseModel {
   @column({ isPrimary: true })
@@ -19,7 +20,10 @@ export default class Permission extends BaseModel {
   @column()
   declare description: string
 
-  @column()
+  @column({
+    serialize: (value: string) =>
+      `${env.get('PROTOCOL')}://${env.get('HOST')}:${env.get('PORT')}/uploads/${value}`,
+  })
   declare letter: string
 
   @column()
@@ -36,4 +40,9 @@ export default class Permission extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+
+  @afterFetch()
+  public static beforeFetchHook(permission: Permission) {
+    permission.letter = '1'
+  }
 }

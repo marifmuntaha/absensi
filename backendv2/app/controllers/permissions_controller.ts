@@ -1,16 +1,20 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Permission from '#models/permission'
 import { storePermissionValidator, updatePermissionValidator } from '#validators/permission'
-import drive from '@adonisjs/drive/services/main'
 import { randomUUID } from 'node:crypto'
 import emitter from '@adonisjs/core/services/emitter'
 import User from '#models/user'
 import moment from 'moment'
+import Teacher from '#models/teacher'
+import drive from '@adonisjs/drive/services/main'
 
 export default class PermissionsController {
-  async index({ request, response }: HttpContext) {
+  async index({ auth, request, response }: HttpContext) {
     try {
       const permission = Permission.query()
+      if (auth?.user?.role === '2') {
+        permission.preload('teacher')
+      }
       if (request.input('teacherId')) {
         permission.where('teacherId', request.input('teacherId'))
       }
@@ -35,18 +39,26 @@ export default class PermissionsController {
   async store({ auth, request, response }: HttpContext) {
     try {
       const data = request.all()
-      const file = request.file('image')
+      const file = request.file('image', {
+        size: '1mb',
+        extnames: ['jpg', 'png', 'jpeg'],
+      })
       const payload = await storePermissionValidator.validate(data)
-      if (file) {
+
+      if (file?.isValid) {
         const key = `images/teacher/permission/${payload.teacherId}-${randomUUID()}.${file.extname}`
         await file.moveToDisk(key)
-        payload.letter = await drive.use().getUrl(key)
+        payload.letter = key
+      } else {
+        return response.badRequest({
+          message: file?.errors && file?.errors[0].message,
+        })
       }
       const createPermission = await Permission.create(payload)
-      const administrator = await User.query().where('role', '2').first()
+      const head = await User.query().where('role', '2').first()
       const createNotify = {
         fromUser: auth.user?.id,
-        toUser: administrator?.id,
+        toUser: head?.id,
         type: '1',
         status: '2',
         message: `Pengajuan Ijin ${auth.user?.name}`,
@@ -84,6 +96,22 @@ export default class PermissionsController {
       const payload = await updatePermissionValidator.validate(data)
       const permission = await Permission.findOrFail(payload.id)
       const updatePermission = await permission.fill(payload).save()
+      const head = await User.query().where('role', '2').first()
+      const teacher = await Teacher.findOrFail(updatePermission.teacherId)
+      const message =
+        updatePermission.accept === '1'
+          ? `Pengajuan ijin atas nama ${teacher.name} Disetujui`
+          : `Pengajuan ijin atas nama ${teacher.name} Ditolak`
+      const createNotify = {
+        fromUser: head?.id,
+        toUser: teacher.user_id,
+        type: '1',
+        status: updatePermission.accept,
+        message: message,
+        read: '2',
+      }
+      // @ts-ignore
+      await emitter.emit('permission:store', createNotify)
       return response.status(200).json({
         message: 'Data Perijinan berhasil diperbarui.',
         result: updatePermission,
@@ -99,6 +127,7 @@ export default class PermissionsController {
     try {
       const permission = await Permission.findOrFail(params.id)
       await permission.delete()
+      await drive.use('fs').delete(permission.letter)
       return response.status(200).json({
         message: 'Data Perijinan berhasil dihapus.',
         result: permission,

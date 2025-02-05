@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
+import env from '#start/env'
 
 export default class School extends BaseModel {
   @column({ isPrimary: true })
@@ -17,7 +18,10 @@ export default class School extends BaseModel {
   @column()
   declare email: string
 
-  @column()
+  @column({
+    serialize: (value: string) =>
+      `${env.get('PROTOCOL')}://${env.get('HOST')}:${env.get('PORT')}/uploads/${value}`,
+  })
   declare logo: string
 
   @column()

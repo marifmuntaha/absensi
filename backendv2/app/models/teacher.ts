@@ -6,6 +6,7 @@ import QRCode from 'qrcode'
 import app from '@adonisjs/core/services/app'
 import drive from '@adonisjs/drive/services/main'
 import Presence from '#models/presence'
+import env from "#start/env";
 
 export default class Teacher extends BaseModel {
   @column({ isPrimary: true })
@@ -32,10 +33,16 @@ export default class Teacher extends BaseModel {
   @column()
   declare address: string
 
-  @column()
+  @column({
+    serialize: (value: string) =>
+      `${env.get('PROTOCOL')}://${env.get('HOST')}:${env.get('PORT')}/uploads/${value}`,
+  })
   declare image: string
 
-  @column()
+  @column({
+    serialize: (value: string) =>
+      `${env.get('PROTOCOL')}://${env.get('HOST')}:${env.get('PORT')}/uploads/${value}`,
+  })
   declare qrcode: string
 
   @column.dateTime({ autoCreate: true })
