@@ -2,16 +2,17 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 import drive from '@adonisjs/drive/services/main'
 import PDFDocument from 'pdfkit'
-import fs from 'node:fs'
 import app from '@adonisjs/core/services/app'
 import School from '#models/school'
 import Teacher from '#models/teacher'
 import moment from 'moment'
 import 'moment/locale/id.js'
-import selfsigned from 'selfsigned'
-import signpdf from '@signpdf/signpdf'
+import User from '#models/user'
+import forge from 'node-forge'
 import { P12Signer } from '@signpdf/signer-p12'
+import * as fs from 'node:fs'
 import { plainAddPlaceholder } from '@signpdf/placeholder-plain'
+import { SignPdf } from '@signpdf/signpdf'
 
 export default class DocumentsController {
   async pdf({ request }: HttpContext) {
@@ -19,20 +20,23 @@ export default class DocumentsController {
     const data = request.all()
     const value = JSON.parse(data.value)
     const teacher = await Teacher.findOrFail(data.teacherId)
+    const head = await User.query().where('role', '2').first()
     const width = 612
     const logo = await drive.use('fs').getStream('/images/logo.png')
     const signature = await drive.use('fs').getStream('/images/logo.png')
+    const monthYear = moment(data.date).locale('id').format('MMMM-YYYY').toString()
+    const lastDate = moment(data.date)
+      .locale('id')
+      .endOf('months')
+      .format('DD MMMM YYYY')
+      .toString()
 
     const pdf = new PDFDocument({
       pdfVersion: '1.4',
       size: 'FOLIO',
       margin: 10,
     })
-    pdf.pipe(
-      fs.createWriteStream(
-        app.makePath(`storage/document/${teacher?.id}-${data.month}-${data.year}.pdf`)
-      )
-    )
+    pdf.pipe(fs.createWriteStream(app.makePath(`storage/document/${teacher?.id}-${monthYear}.pdf`)))
 
     // @ts-ignore
     pdf.image(logo?.path, 35, 15, { width: (width * 11) / 100 })
@@ -67,11 +71,7 @@ export default class DocumentsController {
 
     pdf.font('Times-Bold')
     pdf.fontSize(11)
-    const date = moment(moment(data.month + '-' + data.year, 'M-YYYY'))
-      .locale('id')
-      .format('MMMM YYYY')
-      .toString()
-    pdf.text(`REKAPITULASI BULAN ${date.toUpperCase()}`, 0, 90, {
+    pdf.text(`REKAPITULASI BULAN ${monthYear.toUpperCase()}`, 0, 90, {
       width: width,
       align: 'center',
     })
@@ -153,7 +153,7 @@ export default class DocumentsController {
       .moveTo(40, highLine)
       .lineTo(width - 40, highLine)
       .stroke()
-    pdf.text('Jepara, 31 Januari 2025', (width * 70) / 100, highLine + 15, {
+    pdf.text(`Jepara, ${lastDate}`, (width * 70) / 100, highLine + 15, {
       width: (width * 40) / 100,
     })
     pdf.text('Kepala Madrasah', (width * 70) / 100, highLine + 30, {
@@ -163,7 +163,8 @@ export default class DocumentsController {
     // @ts-ignore
     pdf.image(signature?.path, (width * 70) / 100, highLine + 42, { width: (width * 10) / 100 })
 
-    pdf.text('Faiz Noor, S.Pd.', (width * 70) / 100, highLine + 105, {
+    // @ts-ignore
+    pdf.text(head?.name, (width * 70) / 100, highLine + 105, {
       width: (width * 40) / 100,
     })
     pdf
@@ -172,71 +173,126 @@ export default class DocumentsController {
       .stroke()
     pdf.font('Times-Italic')
     pdf.fontSize(10)
-    pdf.text('Dokumen ini telah ditanda tangani secara elektronik, token : a9dwej', 45, 905, {
-      width: (width * 80) / 100,
-    })
+    pdf.text(
+      `Dokumen ini telah ditanda tangani secara elektronik, token : ${data.number}`,
+      45,
+      905,
+      {
+        width: (width * 80) / 100,
+      }
+    )
     pdf.end()
   }
 
-  async cert() {
-    const attr = [
-      {
-        name: 'commonName',
-        value: 'Muhammad Arif Muntaha',
-      },
-    ]
-    selfsigned.generate(
-      attr,
-      {
-        days: 365,
-      },
-      (_err, data) => {
-        fs.writeFile(
-          app.makePath('storage/cert/52/private.pem'),
-          data?.private.toString(),
-          (err) => {
-            console.error('error', err)
-          }
-        )
-        fs.writeFile(app.makePath('storage/cert/52/public.pem'), data?.public.toString(), (err) => {
-          console.error('error', err)
-        })
-        fs.writeFile(app.makePath('storage/cert/52/cert.pem'), data?.cert.toString(), (err) => {
-          console.error('error', err)
-        })
-      }
-    )
-    const document = await drive.use('fs').get('document/1.pdf')
-    const certificate = await drive.use('fs').get('cert/52/cert.pem')
-    const signer = new P12Signer(Buffer.from(certificate))
-    const signedPdf = new signpdf.SignPdf()
-    await signedPdf.sign(Buffer.from(document), signer)
-    console.log(signedPdf)
-  }
-
-  async test() {
-    const pdfBuffer = fs.readFileSync(app.makePath('storage/document/1-1-2025.pdf'))
-    // certificate.p12 is the certificate that is going to be used to sign
-    const certificateBuffer = fs.readFileSync(app.makePath('storage/cert/52/cert.pem'))
-    const signer = new P12Signer(certificateBuffer)
-
-    // The PDF needs to have a placeholder for a signature to be signed.
+  async verify() {
+    const filePdf = await drive.use('fs').getStream('/document/1-Januari-2025.pdf')
+    const fileCert = await drive.use('fs').getStream('/cert/signed.p12')
+    const pdfBuffer = fs.readFileSync(filePdf?.path)
+    const certificateBuffer = fs.readFileSync(fileCert?.path)
+    const signer = new P12Signer(certificateBuffer, { passphrase: 'password' })
     const pdfWithPlaceholder = plainAddPlaceholder({
       pdfBuffer,
-      reason: 'The user is decalaring consent.',
-      contactInfo: 'signpdf@example.com',
-      name: 'John Doe',
-      location: 'Free Text Str., Free World',
+      reason: 'asd',
+      contactInfo: 'asd',
+      name: 'asd',
+      location: 'asd',
     })
+    const signed = new SignPdf()
+    const signedPdf = await signed.sign(pdfWithPlaceholder, signer)
+    const targetPath = app.makePath('storage/document/1-Januari-2025-signed.pdf')
+    fs.writeFileSync(targetPath, signedPdf)
+  }
 
-    // pdfWithPlaceholder is now a modified buffer that is ready to be signed.
-
-    const signedPdf = new signpdf.SignPdf()
-    await signedPdf.sign(pdfWithPlaceholder, signer)
-
-    // signedPdf is a Buffer of an electronically signed PDF. Store it.
-    // const targetPath = `${__dirname}/../output/typescript.pdf`
-    // fs.writeFileSync(targetPath, signedPdf)
-    // console.log(pdfBuffer)
+  async certificate() {
+    let keys = forge.pki.rsa.generateKeyPair(2048)
+    let cert = forge.pki.createCertificationRequest()
+    cert.publicKey = keys.publicKey
+    cert.serialNumber = '01'
+    cert.validity.notBefore = new Date()
+    cert.validity.notAfter = new Date()
+    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1)
+    const attrs = [
+      {
+        name: 'commonName',
+        value: 'Sholihin, S.Ag.',
+      },
+      {
+        name: 'countryName',
+        value: 'ID',
+      },
+      {
+        shortName: 'ST',
+        value: 'Jawa Tengah',
+      },
+      {
+        name: 'localityName',
+        value: 'Indonesia',
+      },
+      {
+        name: 'organizationName',
+        value: 'MTs. Darul Hikmah Menganti',
+      },
+      {
+        shortName: 'OU',
+        value: 'Test',
+      },
+    ]
+    cert.setSubject(attrs)
+    cert.setIssuer(attrs)
+    cert.setExtensions([
+      {
+        name: 'basicConstraints',
+        cA: true,
+      },
+      {
+        name: 'keyUsage',
+        keyCertSign: true,
+        digitalSignature: true,
+        nonRepudiation: true,
+        keyEncipherment: true,
+        dataEncipherment: true,
+      },
+      {
+        name: 'extKeyUsage',
+        serverAuth: true,
+        clientAuth: true,
+        codeSigning: true,
+        emailProtection: true,
+        timeStamping: true,
+      },
+      {
+        name: 'nsCertType',
+        client: true,
+        server: true,
+        email: true,
+        objsign: true,
+        sslCA: true,
+        emailCA: true,
+        objCA: true,
+      },
+      {
+        name: 'subjectAltName',
+        altNames: [
+          {
+            type: 6, // URI
+            value: 'http://example.org/webid#me',
+          },
+          {
+            type: 7, // IP
+            ip: '127.0.0.1',
+          },
+        ],
+      },
+      {
+        name: 'subjectKeyIdentifier',
+      },
+    ])
+    cert.sign(keys.privateKey)
+    let testing = forge.pki.certificationRequestToAsn1(cert)
+    let p12Asn1 = forge.pkcs12.toPkcs12Asn1(keys.privateKey, testing, 'password')
+    let p12Der = forge.asn1.toDer(p12Asn1).getBytes()
+    let testing1 = forge.asn1.fromDer(p12Der)
+    let testing2 = forge.pkcs12.pkcs12FromAsn1(testing1, 'password')
+    // await drive.use('fs').put('cert/signed.p12', p12Der.toString())
   }
 }

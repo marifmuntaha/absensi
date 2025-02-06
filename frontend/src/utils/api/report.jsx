@@ -16,7 +16,7 @@ function show(params) {
     const baseUrl = `/report/${params.id}`
     return api.get(`${baseUrl}`)
 }
-function update(params: {id: string, name: string, description: string, active: string}) {
+function update(params: {id: string, teacherId: string, number: string, date: string, value: string }) {
     const baseUrl = `/report/${params.id}`
     return api.update(`${baseUrl}`, params)
 }

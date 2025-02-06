@@ -14,11 +14,12 @@ import {
 } from "../../components";
 import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
-import Partials from "../presence/Partials";
-import {get as getPermission,destroy as destroyPermission} from "../../utils/api/permission"
+import Partials from "./Partials";
+import {get as getPermission, destroy as destroyPermission} from "../../utils/api/permission"
 import moment from "moment";
 import "moment/locale/id"
 import {APICore} from "../../utils/api/APICore";
+import ImageContainer from "../../components/partials/galery";
 
 const Permission = () => {
     const api = new APICore();
@@ -28,6 +29,8 @@ const Permission = () => {
     const [permission, setPermission] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loadData, setLoadData] = useState(true);
+    const [open, setOpen] = useState(false);
+    const [letter, setLetter] = useState('')
     const Columns = () => {
         const cols = [
             {
@@ -45,20 +48,20 @@ const Permission = () => {
                 name: "Keterangan",
                 selector: (row) => row.description,
                 sortable: false,
-                hide: 400,
+                // hide: 400,
             },
             {
                 name: "Status",
                 selector: (row) => row.accept,
                 sortable: false,
                 cell: (row) => {
-                    switch(row.accept) {
+                    switch (row.accept) {
                         case "1":
-                            return <Badge pill color="outline-success" ><Icon name="check-thick"/><span>Disetujui</span></Badge>;
+                            return <Badge pill color="outline-success"><Icon name="check-thick"/><span>Disetujui</span></Badge>;
                         case "2":
-                            return <Badge pill color="outline-warning" ><Icon name="clock"/><span>Diajukan</span></Badge>
+                            return <Badge pill color="outline-warning"><Icon name="clock"/><span>Diajukan</span></Badge>
                         case "3":
-                            return <Badge pill color="outline-danger" ><Icon name="cross"/> <span>Ditolak</span></Badge>
+                            return <Badge pill color="outline-danger"><Icon name="cross"/> <span>Ditolak</span></Badge>
                         default:
                     }
                 }
@@ -71,11 +74,16 @@ const Permission = () => {
                 cell: (row) => {
                     return user.role === '2' ? (
                         <ButtonGroup size="sm">
-                            <Button outline color="info" onClick={() => alert('Surat Ijin')}><Icon name="eye"/></Button>
-                            <Button outline color="warning" onClick={() => {
-                                setPermission(row);
-                                setModal(true);
-                            }}><Icon name="edit-alt"/></Button>
+                            <Button outline color="info" onClick={() => {
+                                setOpen(true);
+                                setLetter(row.letter)
+                            }}><Icon name="file"/></Button>
+                            {row.accept === "2" && (
+                                <Button outline color="warning" onClick={() => {
+                                    setPermission(row);
+                                    setModal(true);
+                                }}><Icon name="edit-alt"/></Button>
+                            )}
                         </ButtonGroup>
                     ) : (
                         <Button outline color="danger" size="sm" onClick={() => {
@@ -88,7 +96,7 @@ const Permission = () => {
                                 RToast(err, 'error')
                                 setLoading(false)
                             });
-                        }}>{loading  === row.id ? <Spinner size="sm" /> : <Icon name="trash"/>}</Button>
+                        }}>{loading === row.id ? <Spinner size="sm"/> : <Icon name="trash"/>}</Button>
                     )
                 }
             },
@@ -111,7 +119,7 @@ const Permission = () => {
     }, [loadData]);
     return (
         <Suspense fallback={<div>Loading..</div>}>
-            <Head title="Data Perijinan" />
+            <Head title="Data Perijinan"/>
             <Content page={user.role === '3' ? "component" : ""}>
                 <BlockHead size="lg" wide="sm">
                     <BlockHeadContent>
@@ -126,7 +134,8 @@ const Permission = () => {
                             <BlockHeadContent>
                                 <BlockTitle tag="h4">Data Perijinan</BlockTitle>
                                 <p>
-                                    Just import <code>ReactDataTable</code> from <code>components</code>, it is built in for react dashlite.
+                                    Just import <code>ReactDataTable</code> from <code>components</code>, it is built in
+                                    for react dashlite.
                                 </p>
                             </BlockHeadContent>
                             {user.role === '3' && (
@@ -163,11 +172,18 @@ const Permission = () => {
                         </BlockBetween>
                     </BlockHead>
                     <PreviewCard>
-                        <ReactDataTable data={permissions} columns={Columns()} expandableRows pagination />
+                        <ReactDataTable data={permissions} columns={Columns()} expandableRows pagination/>
                     </PreviewCard>
                 </Block>
             </Content>
-            <Partials modal={modal} setModal={setModal} permission={permission} setPermission={setPermission} setLoadData={setLoadData}/>
+            <Partials
+                modal={modal}
+                setModal={setModal}
+                permission={permission}
+                setPermission={setPermission}
+                setLoadData={setLoadData}
+            />
+            <ImageContainer img={letter} setLetter={setLetter} open={open} setOpen={setOpen} />
         </Suspense>
     )
 }

@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
 import Teacher from '#models/teacher'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import type { HasOne } from '@adonisjs/lucid/types/relations'
 
 export default class Report extends BaseModel {
   @column({ isPrimary: true })
@@ -22,11 +22,11 @@ export default class Report extends BaseModel {
   @column()
   declare accept: string
 
-  @hasMany(() => Teacher, {
+  @hasOne(() => Teacher, {
     foreignKey: 'id',
     localKey: 'teacherId',
   })
-  declare teacher: HasMany<typeof Teacher>
+  declare teacher: HasOne<typeof Teacher>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

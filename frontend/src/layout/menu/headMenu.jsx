@@ -19,8 +19,8 @@ const headMenu = [
                 link: "/kepala/ajuan/ijin",
             },
             {
-                text: "Ajuan TTD",
-                link: "/kepala/absensi/rekapitulasi",
+                text: "Ajuan Tanda Tangan",
+                link: "/kepala/ajuan/ttd",
             },
         ],
     },

@@ -4,7 +4,8 @@ import {Col, Row, RSelect, RToast} from "../../components";
 import {Controller, useForm} from "react-hook-form";
 import {store as storePermission, update as updatePermission} from "../../utils/api/permission"
 import moment from "moment";
-    import {APICore} from "../../utils/api/APICore";
+import {APICore} from "../../utils/api/APICore";
+import {store as storePresence} from "../../utils/api/presence";
 
 
 const Partials = ({...props}) => {
@@ -51,11 +52,28 @@ const Partials = ({...props}) => {
             letter: getValues('letter'),
             accept: getValues('accept')
         }
-        await updatePermission(params).then(resp => {
-            RToast(resp.data.message, 'success');
-            toggle();
-            props.setLoadData(true);
-            setLoading(false);
+        await updatePermission(params).then(async (resp) => {
+            const result = resp.data.result;
+            const params = {
+                teacher_id: result.teacherId,
+                date: result.date,
+                in: moment().format('HH:mm:ss'),
+                out: moment().format('HH:mm:ss'),
+                status_in: result.status,
+                status_out: result.status,
+                description: result.description,
+                letter: result.letter
+            }
+            await storePresence(params).then(resp => {
+                RToast(resp.data.message, 'success');
+                toggle();
+                props.setLoadData(true);
+                setLoading(false);
+            }).catch(err => {
+                RToast(err, 'error');
+                setLoading(false);
+            })
+
         }).catch(err => {
             RToast(err, 'error');
             setLoading(false);

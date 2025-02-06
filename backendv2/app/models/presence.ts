@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, column, hasOne } from '@adonisjs/lucid/orm'
 import Teacher from '#models/teacher'
 import type { HasOne } from '@adonisjs/lucid/types/relations'
+import env from '#start/env'
 
 export default class Presence extends BaseModel {
   @column({ isPrimary: true })
@@ -42,4 +43,12 @@ export default class Presence extends BaseModel {
     localKey: 'teacherId',
   })
   declare teacher: HasOne<typeof Teacher>
+
+  @beforeCreate()
+  static async mutatorLetter(presence: Presence): Promise<void> {
+    presence.letter = presence.letter.replace(
+      `${env.get('PROTOCOL')}://${env.get('HOST')}:${env.get('PORT')}/uploads/`,
+      ''
+    )
+  }
 }

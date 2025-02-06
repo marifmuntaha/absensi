@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { afterFetch, BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeUpdate, column, hasOne } from '@adonisjs/lucid/orm'
 import Teacher from '#models/teacher'
 import type { HasOne } from '@adonisjs/lucid/types/relations'
 import env from '#start/env'
@@ -41,8 +41,11 @@ export default class Permission extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @afterFetch()
-  public static beforeFetchHook(permission: Permission) {
-    permission.letter = '1'
+  @beforeUpdate()
+  static async mutatorLetter(permission: Permission): Promise<void> {
+    permission.letter = permission.letter.replace(
+      `${env.get('PROTOCOL')}://${env.get('HOST')}:${env.get('PORT')}/uploads/`,
+      ''
+    )
   }
 }

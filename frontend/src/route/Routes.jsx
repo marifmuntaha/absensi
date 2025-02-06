@@ -12,6 +12,7 @@ const AdministratorUser = React.lazy(() => import('../pages/user'));
 const AdministratorPresence = React.lazy(() => import('../pages/presence'));
 const PresenceDetail = React.lazy(() => import('../pages/presence/Detail'));
 const Recapitulation = React.lazy(() => import('../pages/recapitulation'));
+const Report = React.lazy(() => import('../pages/report'))
 
 
 const TeacherDashboard = React.lazy(() => import('../pages/dashboard'));
@@ -44,6 +45,7 @@ const headRoute = [
     {path: '/', name: 'Dashboard', element: <Dashboard />},
     {path: '/kepala/data-guru', name: 'Data Guru', element: <Teacher />},
     {path: '/kepala/ajuan/ijin', name: 'Ajuan Ijin', element: <Permission />},
+    {path: '/kepala/ajuan/ttd', name: 'Ajuan Tanda Tangan', element: <Report />},
 ]
 
 const teacherRoute = [

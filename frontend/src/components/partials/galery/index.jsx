@@ -1,28 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal } from "reactstrap";
 
-const ImageContainer = ({ img }) => {
-    const [open, setOpen] = useState(false);
+const ImageContainer = ({ img, setLetter, open, setOpen}) => {
     const toggle = () => {
         setOpen(!open);
+        setLetter('');
     };
     return (
-        <a
-            className="gallery-image popup-image"
-            onClick={(ev) => {
-                ev.preventDefault();
-                toggle();
-            }}
-            href="#gallery"
-        >
-            <img className="w-100 rounded-top" src={img} alt="" />
-            <Modal isOpen={open} toggle={toggle} size="large" contentClassName="rounded-5">
-                <button type="button" className="mfp-close" onClick={toggle}>
-                    ×
-                </button>
-                <img className="w-100 rounded-5" style={{ height: "100%" }} src={img} alt="" />
-            </Modal>
-        </a>
+        <Modal isOpen={open} toggle={toggle} size="large" contentClassName="rounded-5">
+            <button type="button" className="mfp-close" onClick={toggle}>
+                ×
+            </button>
+            <img className="w-100 rounded-5" style={{ height: "100%" }} src={img} alt="" />
+        </Modal>
     );
 };
 

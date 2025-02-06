@@ -37,7 +37,9 @@ router
         router.post('logout', [AuthController, 'logout'])
       })
       .prefix('auth')
-    router.post('generate/pdf', [DocumentController, 'pdf'])
+    router.post('document/absensi', [DocumentController, 'pdf'])
+    router.get('document/verify', [DocumentController, 'verify'])
+    router.get('document/test', [DocumentController, 'certificate'])
     router
       .group(() => {
         router
