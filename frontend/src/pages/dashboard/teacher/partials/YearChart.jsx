@@ -46,7 +46,7 @@ const YearChart = () => {
     useEffect(() => {
         let month = 1;
         while (month < 13) {
-            getPresent({teacherId: teacher.id, month: month, year: moment().format('YYYY').toString()}).then((resp) => {
+            getPresent({teacherId: teacher?.id, month: month, year: moment().format('YYYY').toString()}).then((resp) => {
                 setPresent(present => [...present, resp.data.result?.filter((item) => {
                     return item.statusIn === 'H'
                 })?.length])

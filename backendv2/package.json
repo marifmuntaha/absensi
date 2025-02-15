@@ -61,7 +61,6 @@
     "@adonisjs/drive": "^3.2.0",
     "@adonisjs/i18n": "^2.2.0",
     "@adonisjs/lucid": "^21.5.1",
-    "@signpdf/placeholder-pdfkit": "^3.2.4",
     "@signpdf/placeholder-plain": "^3.2.4",
     "@signpdf/signer-p12": "^3.2.4",
     "@signpdf/signpdf": "^3.2.4",

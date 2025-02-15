@@ -1,8 +1,7 @@
 import React, {Suspense, useEffect, useState} from "react";
-import {Block, BlockContent, BlockDes, BlockHead, BlockTitle, Col, PreviewCard} from "../../../components";
+import {BlockContent, BlockDes, BlockHead, BlockTitle, Col, PreviewCard} from "../../../components";
 import moment from "moment/moment";
-import {Alert, Card} from "reactstrap";
-import ImageContainer from "../../../components/partials/galery";
+import {Alert} from "reactstrap";
 
 const TeacherQR = () => {
     const teacher = JSON.parse(localStorage.getItem("teacher"));
@@ -28,7 +27,7 @@ const TeacherQR = () => {
                     </BlockContent>
                 </BlockHead>
                 <Col className="border border-3 border-info align-self-center">
-                    <ImageContainer img={teacher.qrcode} />
+                    <img className="w-100 rounded-5" style={{ height: "100%" }} src={teacher.qrcode} alt="" />
                 </Col>
             </PreviewCard>
         </Suspense>

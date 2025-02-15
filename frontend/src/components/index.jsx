@@ -1,5 +1,6 @@
 import Button from "./button";
 import Icon from "./icon";
+import ImageContainer from "./galery";
 import UserAvatar from "./user/UserAvatar";
 import {Block, BlockHead, BlockHeadContent, BlockTitle, BlockDes, BlockContent, BlockBetween, BackTo} from "./block";
 import {LinkList, LinkItem} from "./links";
@@ -27,6 +28,7 @@ export {
     Col,
     DoughnutChart,
     Icon,
+    ImageContainer,
     LinkList,
     LinkItem,
     DataTablePagination,

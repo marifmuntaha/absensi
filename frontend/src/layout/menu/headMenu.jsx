@@ -10,7 +10,7 @@ const headMenu = [
         link: "/kepala/data-guru",
     },
     {
-        icon: "check",
+        icon: "file",
         text: "Ajuan",
         active: false,
         subMenu: [
@@ -38,6 +38,11 @@ const headMenu = [
                 link: "/kepala/absensi/rekapitulasi",
             },
         ],
+    },
+    {
+        icon: "check",
+        text: "Tanda Tangan",
+        link: "/kepala/tanda-tangan",
     },
     {
         icon: "setting-alt",

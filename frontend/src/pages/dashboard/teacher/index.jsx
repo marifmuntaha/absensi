@@ -61,10 +61,10 @@ const Teacher = () => {
             setHoliday(holidays?.length)
             setActive(lastDate ? parseInt(lastDate) - holidays?.length : 0)
         });
-        getPermission({teacherId: teacher.id, month: month, year: moment().format('YYYY').toString()}).then((resp) => {
+        getPermission({teacherId: teacher?.id, month: month, year: moment().format('YYYY').toString()}).then((resp) => {
             setPermission(resp.data.result?.length);
         })
-        getReport({teacherId: teacher.id, month: month, year: moment().format('YYYY').toString()}).then((resp) => {
+        getReport({teacherId: teacher?.id, month: month, year: moment().format('YYYY').toString()}).then((resp) => {
             setReport(resp.data.result?.length);
         })
     }, [month])

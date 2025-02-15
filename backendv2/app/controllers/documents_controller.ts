@@ -8,11 +8,11 @@ import Teacher from '#models/teacher'
 import moment from 'moment'
 import 'moment/locale/id.js'
 import User from '#models/user'
-import forge from 'node-forge'
 import { P12Signer } from '@signpdf/signer-p12'
 import * as fs from 'node:fs'
 import { plainAddPlaceholder } from '@signpdf/placeholder-plain'
 import { SignPdf } from '@signpdf/signpdf'
+import forge from 'node-forge'
 
 export default class DocumentsController {
   async pdf({ request }: HttpContext) {
@@ -184,18 +184,18 @@ export default class DocumentsController {
     pdf.end()
   }
 
-  async verify() {
-    const filePdf = await drive.use('fs').getStream('/document/1-Januari-2025.pdf')
-    const fileCert = await drive.use('fs').getStream('/cert/signed.p12')
+  async sign() {
+    const filePdf = await drive.use('fs').getStream('/document/41-1-2025.pdf')
     const pdfBuffer = fs.readFileSync(filePdf?.path)
-    const certificateBuffer = fs.readFileSync(fileCert?.path)
+    const certificateBuffer = fs.readFileSync(app.makePath('storage/cert/sign.p12'), 'utf-8')
     const signer = new P12Signer(certificateBuffer, { passphrase: 'password' })
     const pdfWithPlaceholder = plainAddPlaceholder({
       pdfBuffer,
-      reason: 'asd',
-      contactInfo: 'asd',
-      name: 'asd',
-      location: 'asd',
+      reason: 'Digital Signature',
+      contactInfo: 'fuadhasan@gmail.com',
+      name: 'Muhammad Fuad Hasan',
+      location: 'Indonesia',
+      signingTime: new Date(),
     })
     const signed = new SignPdf()
     const signedPdf = await signed.sign(pdfWithPlaceholder, signer)
@@ -203,37 +203,30 @@ export default class DocumentsController {
     fs.writeFileSync(targetPath, signedPdf)
   }
 
-  async certificate() {
-    let keys = forge.pki.rsa.generateKeyPair(2048)
-    let cert = forge.pki.createCertificationRequest()
+  async create({ response }: HttpContext) {
+    let pki = forge.pki
+    let keys = pki.rsa.generateKeyPair(1024)
+    let cert = pki.createCertificate()
     cert.publicKey = keys.publicKey
     cert.serialNumber = '01'
     cert.validity.notBefore = new Date()
     cert.validity.notAfter = new Date()
     cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1)
-    const attrs = [
+    let attrs = [
       {
         name: 'commonName',
-        value: 'Sholihin, S.Ag.',
+        value: 'example.org',
       },
       {
         name: 'countryName',
-        value: 'ID',
-      },
-      {
-        shortName: 'ST',
-        value: 'Jawa Tengah',
+        value: 'US',
       },
       {
         name: 'localityName',
-        value: 'Indonesia',
+        value: 'Blacksburg',
       },
       {
         name: 'organizationName',
-        value: 'MTs. Darul Hikmah Menganti',
-      },
-      {
-        shortName: 'OU',
         value: 'Test',
       },
     ]
@@ -271,28 +264,22 @@ export default class DocumentsController {
         objCA: true,
       },
       {
-        name: 'subjectAltName',
-        altNames: [
-          {
-            type: 6, // URI
-            value: 'http://example.org/webid#me',
-          },
-          {
-            type: 7, // IP
-            ip: '127.0.0.1',
-          },
-        ],
-      },
-      {
         name: 'subjectKeyIdentifier',
       },
     ])
     cert.sign(keys.privateKey)
-    let testing = forge.pki.certificationRequestToAsn1(cert)
-    let p12Asn1 = forge.pkcs12.toPkcs12Asn1(keys.privateKey, testing, 'password')
+    let p12Asn1 = forge.pkcs12.toPkcs12Asn1(keys.privateKey, cert, 'password')
     let p12Der = forge.asn1.toDer(p12Asn1).getBytes()
-    let testing1 = forge.asn1.fromDer(p12Der)
-    let testing2 = forge.pkcs12.pkcs12FromAsn1(testing1, 'password')
-    // await drive.use('fs').put('cert/signed.p12', p12Der.toString())
+    let p12b64 = forge.util.encode64(p12Der)
+    fs.writeFileSync(app.makePath('storage/cert/sign.p12'), p12b64, 'utf-8')
+  }
+
+  async read({ response }: HttpContext) {
+    let cert = fs.readFileSync(app.makePath('storage/cert/sign.p12'), 'utf-8')
+    let p12Der = forge.util.decode64(cert)
+    let p12Asn1 = forge.asn1.fromDer(p12Der)
+    let p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, 'password')
+    let bags = p12.getBags({ friendlyName: 'commonName' })
+    return response.json({ test: bags })
   }
 }

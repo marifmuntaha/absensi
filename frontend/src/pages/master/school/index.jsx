@@ -39,7 +39,7 @@ const School = () => {
       params.image = file
     }
     await updateSchool(params).then(resp => {
-      RToast(resp.data.message, 'success')
+      RToast(resp?.data.message, 'success')
       setLoading(false)
     }).catch((err) => {
       RToast(err, 'error')
@@ -220,7 +220,7 @@ const School = () => {
             <Col className="col-md-5">
               <PreviewCard>
                 <Card className="gallery p-3">
-                  <ImageContainer img={filePreview ? filePreview : Logo} />
+                  <img className="w-100 rounded-5" style={{ height: "100%" }} src={filePreview ? filePreview : Logo} alt="" />
                 </Card>
                 <Row className="g-4 mt-1">
                   <form onSubmit={handleSubmit(onSubmit)}>

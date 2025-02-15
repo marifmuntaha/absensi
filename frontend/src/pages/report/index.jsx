@@ -64,7 +64,7 @@ const Report = () => {
                 return (
                     <ul className="preview-list">
                         <li style={{padding: '0.1rem'}}>
-                            <Badge pill color="success">Hadir: {recapitulation.active}</Badge>
+                            <Badge pill color="success">Hadir: {recapitulation.present}</Badge>
                         </li>
                         <li style={{padding: '0.1rem'}}>
                             <Badge pill color="info">Ijin: {recapitulation.permission}</Badge>

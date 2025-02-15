@@ -19,6 +19,7 @@ const PresenceController = () => import('#controllers/presences_controller')
 const ReportController = () => import('#controllers/reports_controller')
 const SchoolController = () => import('#controllers/schools_controller')
 const SemesterController = () => import('#controllers/semesters_controller')
+const SignatureController = () => import('#controllers/signatures_controller')
 const TeacherController = () => import('#controllers/teachers_controller')
 const TokenController = () => import('#controllers/tokens_controller')
 const UserController = () => import('#controllers/users_controller')
@@ -38,8 +39,9 @@ router
       })
       .prefix('auth')
     router.post('document/absensi', [DocumentController, 'pdf'])
-    router.get('document/verify', [DocumentController, 'verify'])
-    router.get('document/test', [DocumentController, 'certificate'])
+    router.get('document/sign', [DocumentController, 'sign'])
+    router.get('document/create', [DocumentController, 'create'])
+    router.get('document/read', [DocumentController, 'read'])
     router
       .group(() => {
         router
@@ -55,6 +57,7 @@ router
         router.resource('permission', PermissionController).apiOnly()
         router.resource('presence', PresenceController).apiOnly()
         router.resource('report', ReportController).apiOnly()
+        router.resource('signature', SignatureController).only(['index', 'store', 'destroy'])
         router.resource('teacher', TeacherController).apiOnly()
         router.resource('token', TokenController).only(['index'])
         router.resource('user', UserController).apiOnly()

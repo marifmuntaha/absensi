@@ -4,7 +4,6 @@ import User from '#models/user'
 import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import QRCode from 'qrcode'
 import app from '@adonisjs/core/services/app'
-import drive from '@adonisjs/drive/services/main'
 import Presence from '#models/presence'
 import env from "#start/env";
 
@@ -74,7 +73,7 @@ export default class Teacher extends BaseModel {
         light: '#0000',
       },
     }).then(async () => {
-      teacher.qrcode = await drive.use().getUrl(`images/qrcode/${teacher.nuptk}.png`)
+      teacher.qrcode = `images/qrcode/${teacher.nuptk}.png`
       await teacher.save()
     })
   }
@@ -90,7 +89,7 @@ export default class Teacher extends BaseModel {
         light: '#0000',
       },
     }).then(async () => {
-      teacher.qrcode = await drive.use().getUrl(`images/qrcode/${teacher.nuptk}.png`)
+      teacher.qrcode = `images/qrcode/${teacher.nuptk}.png`
       await teacher.save()
     })
   }

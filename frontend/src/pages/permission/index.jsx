@@ -24,6 +24,7 @@ import ImageContainer from "../../components/partials/galery";
 const Permission = () => {
     const api = new APICore();
     const user = api.getLoggedInUser();
+    const teacher = JSON.parse(localStorage.getItem("teacher"));
     const [modal, setModal] = useState(false);
     const [permissions, setPermissions] = useState([]);
     const [permission, setPermission] = useState(null);
@@ -72,7 +73,7 @@ const Permission = () => {
                 sortable: false,
                 // hide: 'sm',
                 cell: (row) => {
-                    return user.role === '2' ? (
+                    return user?.role === '2' ? (
                         <ButtonGroup size="sm">
                             <Button outline color="info" onClick={() => {
                                 setOpen(true);
@@ -109,7 +110,10 @@ const Permission = () => {
         return cols
     };
     useEffect(() => {
-        loadData && getPermission().then(resp => {
+        const params = () => {
+            return user?.role === '3' && {teacherId: teacher.id}
+        }
+        loadData && getPermission(params()).then(resp => {
             setPermissions(resp.data.result);
             setLoadData(false);
         }).catch(err => {
@@ -120,7 +124,7 @@ const Permission = () => {
     return (
         <Suspense fallback={<div>Loading..</div>}>
             <Head title="Data Perijinan"/>
-            <Content page={user.role === '3' ? "component" : ""}>
+            <Content page={user?.role === '3' ? "component" : ""}>
                 <BlockHead size="lg" wide="sm">
                     <BlockHeadContent>
                         <BackTo link="/" icon="arrow-left">
