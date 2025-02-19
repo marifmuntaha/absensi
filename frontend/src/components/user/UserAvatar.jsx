@@ -16,7 +16,9 @@ const UserAvatar = ({ className, size, theme, icon, text, image, imageAlt, ...pr
     return (
         <div className={classes}>
             {icon ? <Icon name={icon} /> : null}
-            {image && <img src={image} alt={imageAlt} />}
+            {image && <img src={image} alt={imageAlt} style={{
+                height: "100%", width: "100%"
+            }}/>}
             {text && !image && <span>{text}</span>}
             {props.children}
         </div>

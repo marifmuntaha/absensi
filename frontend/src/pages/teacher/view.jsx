@@ -61,7 +61,7 @@ const View = () => {
                             <PreviewAltCard>
                                 <div className="team">
                                     <div className="user-card user-card-s2">
-                                        <UserAvatar theme="primary" className="lg" text={findUpper(teacher.name ? teacher.name : 'AB')} image={teacher.image} />
+                                        <UserAvatar theme="primary" className="lg" text={findUpper(teacher.name ? teacher.name : 'AB')} image={teacher.image}/>
                                         <div className="user-info">
                                             <h6>{teacher.name}</h6>
                                             <span className="sub-text">{teacher.user && teacher.user.username}</span>
@@ -98,7 +98,7 @@ const View = () => {
                         <Col sm="6" lg="4" xxl="6" className="p-3">
                             <PreviewAltCard>
                                 <Card className="gallery p-3">
-                                    <ImageContainer img={teacher.qrcode ? teacher.qrcode : Logo} />
+                                    <img className="w-100 rounded-5" style={{ height: "100%" }} src={teacher.qrcode ? teacher.qrcode : Logo} alt="" />
                                 </Card>
                             </PreviewAltCard>
                         </Col>

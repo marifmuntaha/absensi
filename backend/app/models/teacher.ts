@@ -1,9 +1,7 @@
 import { DateTime } from 'luxon'
-import { afterCreate, afterUpdate, BaseModel, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
 import User from '#models/user'
 import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
-import QRCode from 'qrcode'
-import app from '@adonisjs/core/services/app'
 import Presence from '#models/presence'
 import env from "#start/env";
 
@@ -60,37 +58,6 @@ export default class Teacher extends BaseModel {
     foreignKey: 'teacherId',
     localKey: 'id',
   })
+
   declare presences: HasMany<typeof Presence>
-
-  @afterCreate()
-  static async afterCreateTeacher(teacher: Teacher) {
-    const sug = JSON.stringify(teacher)
-    const path = app.makePath('storage/images/qrcode')
-    const namePath = `${path}/${teacher.nuptk}.png`
-    await QRCode.toFile(namePath, sug, {
-      color: {
-        dark: '#000000',
-        light: '#0000',
-      },
-    }).then(async () => {
-      teacher.qrcode = `images/qrcode/${teacher.nuptk}.png`
-      await teacher.save()
-    })
-  }
-
-  @afterUpdate()
-  static async afterUpdateTeacher(teacher: Teacher) {
-    const sug = JSON.stringify(teacher)
-    const path = app.makePath('storage/images/qrcode')
-    const namePath = `${path}/${teacher.nuptk}.png`
-    await QRCode.toFile(namePath, sug, {
-      color: {
-        dark: '#000000',
-        light: '#0000',
-      },
-    }).then(async () => {
-      teacher.qrcode = `images/qrcode/${teacher.nuptk}.png`
-      await teacher.save()
-    })
-  }
 }

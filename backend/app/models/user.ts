@@ -1,11 +1,9 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { afterCreate, BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
-import app from '@adonisjs/core/services/app'
-import QRCode from 'qrcode'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['username'],
@@ -44,19 +42,4 @@ export default class User extends compose(BaseModel, AuthFinder) {
     type: 'auth_token',
     tokenSecretLength: 256,
   })
-
-  @afterCreate()
-  static async afterCreateTeacher(user: User) {
-    if (user.role === '2') {
-      const sug = JSON.stringify(user)
-      const path = app.makePath('storage/images/qrcode')
-      const namePath = `${path}/head.png`
-      await QRCode.toFile(namePath, sug, {
-        color: {
-          dark: '#000000',
-          light: '#0000',
-        },
-      })
-    }
-  }
 }

@@ -50,7 +50,7 @@ export default class UsersController {
       const data = request.all()
       const payload = await updateUserValidator.validate(data)
       const user = await User.findOrFail(payload.id)
-      const updateUser = await user.fill(payload).save()
+      const updateUser = await user.merge(payload).save()
       return response.status(200).json({
         message: 'Data Pengguna berhasil diperbarui',
         result: updateUser,

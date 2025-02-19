@@ -28,7 +28,7 @@ const Partials = ({...props}) => {
         setLoading(true);
         const params = {
             teacherId: teacher.id,
-            date: moment().format('YYYY-MM-DD'),
+            date: getValues('date'),
             status: getValues('status'),
             description: getValues('description'),
         }
@@ -39,14 +39,17 @@ const Partials = ({...props}) => {
             RToast(resp.data.message, 'success');
             toggle();
             props.setLoadData(true);
-        }).catch(err => RToast(err, 'error'));
+        }).catch(err => {
+            RToast(err, 'error');
+            setLoading(false);
+        });
     }
     const updateSubmit = async () => {
         setLoading(true);
         const params = {
             id: getValues('id'),
             teacherId: getValues('teacherId'),
-            date: moment().format('YYYY-MM-DD'),
+            date: getValues('date'),
             status: getValues('status'),
             description: getValues('description'),
             letter: getValues('letter'),
@@ -92,7 +95,7 @@ const Partials = ({...props}) => {
             const permission = props.permission;
             setValue('id', permission?.id);
             setValue('teacherId', permission?.teacherId);
-            setValue('date', permission?.date);
+            setValue('date', moment(permission?.date).format('DD-MM-YYYY').toString());
             setValue('status', permission?.status);
             setValue('description', permission.description);
             setValue('letter', permission.letter);
@@ -116,7 +119,8 @@ const Partials = ({...props}) => {
                                             type="text"
                                             className="form-control"
                                             id="date"
-                                            value={moment(getValues('date')).format('DD-MM-YYYY').toString()}
+                                            defaultValue={moment().format('DD-MM-YYYY').toString()}
+                                            value={getValues('date')}
                                             disabled={true}
                                             {...register('date', {required: false})}
                                         />

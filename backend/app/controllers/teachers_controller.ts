@@ -3,6 +3,8 @@ import Teacher from '#models/teacher'
 import { storeTeacherValidator, updateTeacherValidator } from '#validators/teacher'
 import drive from '@adonisjs/drive/services/main'
 import moment from 'moment'
+import app from "@adonisjs/core/services/app";
+import QRCode from "qrcode";
 
 export default class TeachersController {
   async index({ request, response }: HttpContext) {
@@ -40,8 +42,27 @@ export default class TeachersController {
   async store({ request, response }: HttpContext) {
     try {
       const data = request.all()
+      data.file = request.file('image')
       const payload = await storeTeacherValidator.validate(data)
+      if (payload.file) {
+        const key = `images/placeholder/${payload.nuptk}.${data.file.extname}`
+        await data.file.moveToDisk(key)
+        payload.image = key
+        delete payload.file
+      }
       const createTeacher = await Teacher.create(payload)
+      const sug = JSON.stringify(createTeacher)
+      const path = app.makePath('storage/images/qrcode')
+      const namePath = `${path}/${createTeacher.nuptk}.png`
+      await QRCode.toFile(namePath, sug, {
+        color: {
+          dark: '#000000',
+          light: '#0000',
+        },
+      }).then(async () => {
+        createTeacher.qrcode = `images/qrcode/${createTeacher.nuptk}.png`
+        await createTeacher.save()
+      })
       return response.status(201).json({
         message: 'Data Guru berhasil disimpan.',
         result: createTeacher,
@@ -69,9 +90,28 @@ export default class TeachersController {
   async update({ request, response }: HttpContext) {
     try {
       const data = request.all()
+      data.file = request.file('image')
       const payload = await updateTeacherValidator.validate(data)
+      if (payload.file) {
+        const key = `images/placeholder/${payload.nuptk}.${data.file.extname}`
+        await data.file.moveToDisk(key)
+        payload.image = key
+        delete payload.file
+      }
       const teacher = await Teacher.findOrFail(payload.id)
-      const updateTeacher = await teacher.fill(payload).save()
+      const updateTeacher = await teacher.merge(payload).save()
+      const sug = JSON.stringify(updateTeacher)
+      const path = app.makePath('storage/images/qrcode')
+      const namePath = `${path}/${updateTeacher.nuptk}.png`
+      await QRCode.toFile(namePath, sug, {
+        color: {
+          dark: '#000000',
+          light: '#0000',
+        },
+      }).then(async () => {
+        updateTeacher.qrcode = `images/qrcode/${updateTeacher.nuptk}.png`
+        await updateTeacher.save()
+      })
       return response.status(200).json({
         message: 'Data Guru berhasil diperbarui.',
         result: updateTeacher,
@@ -86,6 +126,7 @@ export default class TeachersController {
   async destroy({ params, response }: HttpContext) {
     try {
       const teacher = await Teacher.findOrFail(params.id)
+      await drive.use().delete(`images/placehlder/${teacher.nuptk}.png`)
       await drive.use().delete(`images/qrcode/${teacher.nuptk}.png`)
       await teacher.delete()
       return response.status(200).json({

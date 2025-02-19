@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@adonisjs/transmit-client@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@adonisjs/transmit-client/-/transmit-client-1.0.0.tgz#514afe54ec66df5ee2889e2e2b4a2b6811ced24b"
+  integrity sha512-S8P4ouxoDRpHA6iEu13OxzVuG9aV6eObxBYFlsAouIDmqoiUjcgDWUJrtI26nediV2nGvaAuK98ObIEy1UWGFg==
+
 "@alloc/quick-lru@^5.2.0":
   version "5.2.0"
   resolved "https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz"

@@ -8,6 +8,7 @@ import {store as storeTeacher, update as updateTeacher} from "../../utils/api/te
 const Partials = ({...props}) => {
     const {register, handleSubmit, setValue, formState: {errors}, getValues, reset, control} = useForm();
     const [loading, setLoading] = useState(false);
+    const [image, setImage] = useState({});
     const optionGender = [
         {value: 'L', label: 'Laki-laki'},
         {value: 'P', label: 'Perempuan'},
@@ -37,7 +38,7 @@ const Partials = ({...props}) => {
                 gender: getValues('gender'),
                 phone: getValues('phone'),
                 address: getValues('address'),
-                image: ''
+                image: image
             }
             storeTeacher(params).then(resp => {
                 RToast(resp.data.message, 'success');
@@ -65,10 +66,10 @@ const Partials = ({...props}) => {
             gender: getValues('gender'),
             phone: getValues('phone'),
             address: getValues('address'),
-            image: ''
+            image: image
         }
         updateTeacher(params).then(resp => {
-            RToast(resp, 'success');
+            RToast(resp.data.message, 'success');
             setLoading(false);
             props.setLoadData(true);
             toggle();
@@ -235,10 +236,10 @@ const Partials = ({...props}) => {
                                             <Input
                                                 type="file"
                                                 id="image"
-                                                onChange={(e) => alert('image')}
-                                                {...register('image', {required: false})}
+                                                onChange={(e) => {
+                                                    setImage(e.target.files[0])
+                                                }}
                                             />
-                                            {errors.image && <span className="invalid">Kolom tidak boleh kosong.</span>}
                                         </div>
                                     </div>
                                 </div>

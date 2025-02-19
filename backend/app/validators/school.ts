@@ -1,6 +1,6 @@
-import vine from '@vinejs/vine'
+import vine, {SimpleMessagesProvider} from '@vinejs/vine'
 
-export const updateSchoolValidator = vine.compile(
+const updateSchoolValidator = vine.compile(
   vine.object({
     id: vine.number(),
     name: vine.string(),
@@ -9,5 +9,15 @@ export const updateSchoolValidator = vine.compile(
     email: vine.string().email(),
     type: vine.string(),
     logo: vine.string().optional(),
+    image: vine.file({
+      extnames: ['png'],
+      size: '512kb'
+    }).optional()
   })
 )
+
+updateSchoolValidator.messagesProvider = new SimpleMessagesProvider({
+  'file.extname': 'Gambar harus berekstensi .png',
+  'file.size': 'Ukuran gambar maksimal {{field}}'
+})
+export {updateSchoolValidator}

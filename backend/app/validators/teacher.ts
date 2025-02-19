@@ -9,6 +9,10 @@ export const storeTeacherValidator = vine.compile(
     gender: vine.string(),
     phone: vine.string(),
     address: vine.string(),
+    file: vine.file({
+      extnames: ['jpg', 'jpeg', 'png'],
+      size: '512kb'
+    }).optional(),
     image: vine.string().optional(),
   })
 )
@@ -22,6 +26,11 @@ export const updateTeacherValidator = vine.compile(
     gender: vine.string(),
     phone: vine.string(),
     address: vine.string(),
+    file: vine.file({
+      extnames: ['jpg', 'jpeg', 'png'],
+      size: '512kb'
+    }).optional(),
     image: vine.string().optional(),
   })
+
 )

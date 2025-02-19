@@ -233,4 +233,8 @@ export default class DocumentsController {
       })
     }
   }
+
+  async check() {
+
+  }
 }

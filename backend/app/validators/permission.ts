@@ -6,7 +6,7 @@ export const storePermissionValidator = vine.compile(
     teacherId: vine.number(),
     date: vine
       .date({
-        formats: ['YYYY-MM-DD'],
+        formats: ['DD-MM-YYYY'],
       })
       .transform((date) => DateTime.fromJSDate(date)),
     status: vine.string(),
@@ -22,7 +22,7 @@ export const updatePermissionValidator = vine.compile(
     teacherId: vine.number(),
     date: vine
       .date({
-        formats: ['YYYY-MM-DD'],
+        formats: ['DD-MM-YYYY'],
       })
       .transform((date) => DateTime.fromJSDate(date)),
     status: vine.string(),

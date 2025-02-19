@@ -5,6 +5,7 @@ import {Icon} from "../../../../components";
 import {get as getNotification, update as updateNotification} from "../../../../utils/api/notification"
 import {APICore} from "../../../../utils/api/APICore";
 import moment from "moment";
+import {Transmit} from "@adonisjs/transmit-client";
 
 const NotificationItem = (props) => {
     const { status, type, text, time, id } = props;
@@ -32,7 +33,19 @@ const Notification = () => {
         params.read = '1';
         updateNotification(params).then(() => setLoadData(true));
     }
+    const transporter = async () => {
+        const transmit = new Transmit({
+            baseUrl: process.env.REACT_APP_API_ENDPOINT,
+
+        })
+        const subscription = transmit.subscription(`notification/${user.id}`)
+        await subscription.create()
+        subscription.onMessage((response) => {
+            setNotifications([response.message, ...notifications])
+        })
+    }
     useEffect(() => {
+        transporter().then()
         loadData && getNotification({toUser: user.id, read: '2'}).then(resp => {
             setNotifications(resp.data.result)
         }).then(() => setLoadData(false))
@@ -42,9 +55,13 @@ const Notification = () => {
     return (
         <UncontrolledDropdown className="user-dropdown">
             <DropdownToggle tag="a" className="dropdown-toggle nk-quick-nav-icon">
-                <div className="icon-status icon-status-info">
+                {notifications.length > 0 ? (
+                    <div className="icon-status icon-status-info">
+                        <Icon name="bell" />
+                    </div>
+                ) : (
                     <Icon name="bell" />
-                </div>
+                )}
             </DropdownToggle>
             <DropdownMenu end className="dropdown-menu-xl dropdown-menu-s1">
                 <div className="dropdown-head">

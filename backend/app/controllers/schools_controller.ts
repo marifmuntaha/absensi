@@ -17,20 +17,22 @@ export default class SchoolsController {
   async update({ request, response }: HttpContext) {
     try {
       const data = request.all()
-      const image = request.file('image')
+      data.image = request.file('image')
       const payload = await updateSchoolValidator.validate(data)
-      if (image) {
-        const key = `images/logo.${image.extname}`
-        await image.moveToDisk(key)
+      if (payload.image) {
+        const key = `images/logo.${data.image.extname}`
+        await data.image.moveToDisk(key)
         payload.logo = key
+        delete payload.image
       }
       const school = await School.findOrFail(payload.id)
-      const update = await school.fill(payload).save()
+      const update = await school.merge(payload).save()
       return response.status(200).json({
         message: 'Data Sekolah berhasil diperbarui.',
         result: update,
       })
     } catch (error) {
+      console.log(error)
       return response.status(422).json({
         message: error.messages ? error.messages[0].message : error,
       })

@@ -8,7 +8,8 @@
 */
 
 import router from '@adonisjs/core/services/router'
-import { middleware } from '#start/kernel'
+import {middleware} from '#start/kernel'
+import transmit from "@adonisjs/transmit/services/main";
 
 const AuthController = () => import('#controllers/auth_controller')
 const DocumentController = () => import('#controllers/documents_controller')
@@ -63,3 +64,6 @@ router
       .use(middleware.auth())
   })
   .prefix('api')
+transmit.registerRoutes((route) => {
+  route.prefix('api')
+})
