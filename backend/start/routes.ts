@@ -38,10 +38,8 @@ router
         router.post('logout', [AuthController, 'logout'])
       })
       .prefix('auth')
-    router.post('document/absensi', [DocumentController, 'pdf'])
-    router.get('document/sign', [DocumentController, 'sign'])
-    router.get('document/create', [DocumentController, 'create'])
-    router.get('document/read', [DocumentController, 'read'])
+    router.post('document/create', [DocumentController, 'create'])
+    router.post('document/signed', [DocumentController, 'signed'])
     router
       .group(() => {
         router

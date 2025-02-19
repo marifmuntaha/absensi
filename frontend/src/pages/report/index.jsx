@@ -7,14 +7,14 @@ import {
     BlockHeadContent,
     BlockTitle,
     Button,
-    Icon,
+    Icon, PdfPreview,
     PreviewCard, RToast
 } from "../../components";
 import Content from "../../layout/content";
 import ReactDataTable from "../../components/table";
 import {Badge, ButtonGroup, Spinner} from "reactstrap";
 import {get as getReports, update as updateReport} from "../../utils/api/report";
-import {pdf as generatePdf} from "../../utils/api/generate"
+import {create as createDocument, signed as signedDocument} from "../../utils/api/document"
 import moment from "moment";
 import "moment/locale/id"
 import {randomBytes} from "../../utils/Utils";
@@ -23,13 +23,21 @@ const Report = () => {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadData, setLoadData] = useState(true);
+    const url = 'http://localhost:3333/uploads/document/3-Januari-2025.pdf'
     const onSubmit = async (params) => {
         setLoading(true);
         await updateReport(params).then((resp) => {
             const result = resp.data.result;
             if (result.accept === '1') {
-                generatePdf(result).then(() => {
-                    RToast('Berkas absensi berhasil dibuat.', 'success');
+                createDocument(result).then((resp) => {
+                    const result = resp.data.result;
+                    setTimeout(() => {
+                        signedDocument(result).then((resp) => {
+                            RToast('Dokumen berhasil ditanda tangani.', 'success')
+                        }).catch(error => {
+                            RToast(error, 'danger');
+                        })
+                    }, 3000)
                 }).catch((err) => {
                     RToast(err, 'danger');
                 })
@@ -102,7 +110,7 @@ const Report = () => {
             sortable: false,
             hide: "sm",
             cell: (row) => {
-                return row.accept === '2' && (
+                return row.accept === '2' ? (
                     <ButtonGroup size="sm">
                         <Button outline color="success" onClick={async () => {
                             let params = {
@@ -127,6 +135,12 @@ const Report = () => {
                             onSubmit(params).then(() => setLoading(false));
                         }}>{loading ? <Spinner size="sm"/> : <Icon name="cross"/>}</Button>
                     </ButtonGroup>
+                ) : (
+                    <Button outline color="primary" onClick={() => {
+                        const file = row.teacherId + '-' + moment(row.date).locale('id').format('MMMM-YYYY') + '.pdf'
+                        const url = process.env.REACT_APP_ENDPOINT + 'storage/document/' + file
+                        setUrl(url)
+                    }}>{loading ? <Spinner size="sm"/> : <Icon name="file"/> }</Button>
                 )
             }
         },
@@ -161,6 +175,7 @@ const Report = () => {
                 <PreviewCard>
                     <ReactDataTable data={reports} columns={Columns} expandableRows pagination/>
                 </PreviewCard>
+                <PdfPreview url={url}/>
             </Content>
         </Suspense>
     )

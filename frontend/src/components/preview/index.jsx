@@ -4,6 +4,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { a11yLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { OverlineTitle } from "../text";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import {Document, Page} from "react-pdf";
 
 export const PreviewCard = ({ className, bodyClass, ...props }) => {
     return (
@@ -50,3 +51,13 @@ export const CodeBlock = ({ language, ...props }) => {
         </div>
     );
 };
+
+export const PdfPreview = ({fileUrl}) => {
+    return (
+        <div style={{marginLeft:"27%"}}>
+            <Document file={fileUrl}>
+                <Page pageNumber={1} />
+            </Document>
+        </div>
+    )
+}

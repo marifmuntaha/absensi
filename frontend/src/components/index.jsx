@@ -5,7 +5,7 @@ import UserAvatar from "./user/UserAvatar";
 import {Block, BlockHead, BlockHeadContent, BlockTitle, BlockDes, BlockContent, BlockBetween, BackTo} from "./block";
 import {LinkList, LinkItem} from "./links";
 import {Row, Col} from "./grid";
-import {PreviewCard, PreviewTable, PreviewAltCard, CodeBlock} from "./preview";
+import {PreviewCard, PreviewTable, PreviewAltCard, CodeBlock, PdfPreview} from "./preview";
 import DataTablePagination from "./pagination";
 import RSelect from "./select";
 import RToast from "./toast";
@@ -32,6 +32,7 @@ export {
     LinkList,
     LinkItem,
     DataTablePagination,
+    PdfPreview,
     PreviewCard,
     PreviewTable,
     PreviewAltCard,

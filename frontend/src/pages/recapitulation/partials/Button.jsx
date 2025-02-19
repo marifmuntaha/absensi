@@ -45,7 +45,7 @@ const ButtonAction = ({...props}) => {
             storeReport(params).then(() => {
                 setLoading('2');
                 setLoadData(true);
-                RToast('Validasi absensi berhasil, silahkan menunggu disetujui', 'success')
+                RToast('Pengajuan tanda tangan berhasil, silahkan menunggu disetujui', 'success')
             }).catch(err => {
                 RToast(err, 'error');
                 setLoading('3');
@@ -79,7 +79,7 @@ const ButtonAction = ({...props}) => {
         <Row>
             <Col className="col-md-12 mt-2">
                 <Row>
-                    <Col className="col-md-4 p-1">
+                    <Col className="col-md-6 p-1">
                         <Button
                             size="md"
                             className="btn-block "
@@ -91,7 +91,7 @@ const ButtonAction = ({...props}) => {
                             {ButtonText(report?.accept)}
                         </Button>
                     </Col>
-                    <Col className="col-md-4 p-1">
+                    <Col className="col-md-6 p-1">
                         <DownloadTableExcel
                             filename={`${moment(props.params.month + '-' + props.params.year, 'M-YYYY').locale('id').format('MMMM YYYY').toString()}`}
                             currentTableRef={props.tableRef.current}
